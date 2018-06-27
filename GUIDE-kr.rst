@@ -135,9 +135,9 @@ add any routes to the application.
 Configuration
 ~~~~~~~~~~~~~
 
-Duct applications are built around an edn_ configuration file. This
-defines the structure and dependencies of the application. In the
-project we're writing in this guide, the configuration is located at:
+덕트 어플리케이션은 edn_ 구성 파일 주위에 빌드됩니다.
+이것은 어플리케이션의 구조와 디펜던시를 정의합니다.
+현 가이드에서 만든 프로젝트에서, 컨피그레이션 파일은 다음 위치에 있습니다.
 ``resources/todo/config.edn``.
 
 
