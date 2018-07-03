@@ -7,8 +7,8 @@ Duct Framework 가이드
 Duct는 Clojure_ 프로그래밍 언어로 서버 애플리케이션을 만들기 위한 data-driven 프레임워크입니다.
 이 가이드는 웹 애플리케이션 중점을 두고 Duct 사용법을 자세히 설명하기 위해 섰습니다.
 
-또 이 가이드는 Leiningen_ 이 설치되어 있고 Clojure 실무 지식이 있다는 가정을 하고 썼습니다.
-꼭 필요한 것은 아니지만 Ring_의 기초적인 부분을 알고 있으면 좋습니다.
+또 이 가이드는 Leiningen_\이 설치되어 있고 Clojure 실무 지식이 있다는 가정을 하고 썼습니다.
+꼭 필요한 것은 아니지만 Ring_\의 기초적인 부분을 알고 있으면 좋습니다.
 
 .. _Clojure:   https://clojure.org/
 .. _Leiningen: https://leiningen.org/
@@ -28,61 +28,53 @@ Duct Leiningen 템플릿으로 바로 시작해 볼 수 있습니다. Duct로 �
 
   $ lein new duct todo +api +ataraxy +sqlite
 
-결과는 이렇게 나옵니다::
+이런 결과가 나옵니다::
 
   Generating a new Duct project named todo...
   Run 'lein duct setup' in the project directory to create local config files.
 
-The parameters prefixed by ``+`` are profile hints, which are used to
-tell the template we want to build a web service (``+api``), using the
-Ataraxy_ routing library (``+ataraxy``), against a SQLite database
-(``+sqlite``).
+``+``\로 시작하는 파라미터는 프로필 힌트로 웹 서비스 (``+api``)와 Ataraxy_ 라우팅 라이브러리
+(``+ataraxy``), SQLite 데이터베이스 (``+sqlite``)를 사용하는 프로젝트를 만들어 줍니다.
 
-If you want to see what profile hints there are available, you can
-run::
+사용할 수 있는 프로필 힌트를 모두 보려면 아래 명령어를 실행합니다::
 
   $ lein new :show duct
 
-For now, let's change directory into the ``todo`` project that has
-been created::
+이제 조금 전에 만든 ``todo`` 프로젝트 디렉터리로 들어가 봅시다::
 
   $ cd todo
 
-Then run the local setup::
+그리고 로컬 셑업을 실행합니다::
 
   $ lein duct setup
 
-This creates four files that should be kept out of source control::
+그러면 소스 컨트롤에는 제외되어 있는 파일 4개가 생깁니다::
 
   Created profiles.clj
   Created .dir-locals.el
   Created dev/resources/local.edn
   Created dev/src/local.clj
 
-If you're using Git_, then these files are already added to your
-``.gitignore`` file. If you're using another version control system,
-then you'll need to manually update your ignore files.
+Git_\을 사용하면 이 파일들은 ``.gitignore``\에 추가되어 있습니다. 하지만 다른 소스 컨트롤을 사용한다면
+소스 컨트롤에 관리되지 않도록 수동으로 처리해줘야 합니다.
 
 .. _SQLite:  https://sqlite.org/
 .. _Ataraxy: https://github.com/weavejester/ataraxy
 .. _Git:     https://git-scm.com/
 
 
-Starting the REPL
+REPL 시작하기
 """""""""""""""""
 
-Duct development is orientated around the REPL. It's recommended that
-you use an editor with REPL integration, such as Cursive_, Emacs_ with
-CIDER_, Vim_ with `fireplace.vim`_, or Atom_ with `Proto REPL`_.
-However, this guide doesn't require editor integration, and the
-instructions will assume you're working directly from the command
-line.
+Duct는 REPL을 중심으로 개발 하도록 되어 있습니다. 그래서 Cursive_\나 Emacs_\의 CIDER_, Vim_\의
+`fireplace.vim`_, Atom_\의 `Proto REPL`_\같은 에디터 REPL 통합 환경을 사용하는 것을 추천합니다.
+하지만 이 가이드에서는 에디터 통합 없이 커맨드 라인에서 직접 실행해볼 수 있도록 되어 있습니다.
 
-So start the REPL with::
+REPL을 시작합니다::
 
   $ lein repl
 
-At the prompt, we'll first load the development environment:
+먼저 개발 환경을 로드하기 위해 프롬프트에 다음과 같이 입력합니다::
 
 .. code-block:: clojure
 
@@ -90,10 +82,9 @@ At the prompt, we'll first load the development environment:
   :loaded
   dev=>
 
-This isn't loaded automatically, as errors in the development could
-cause the REPL not to start.
+개발 환경에 에러가 있는 경우 REPL이 실행되지 않을 수 있기 때문에 개발 환경은 자동으로 로드하지 않습니다.
 
-Once we're in the ``dev`` namespace we can start the application:
+``dev`` 네임스페이스에 들어오면 애플리케이션을 실행해볼 수 있습니다::
 
 .. code-block:: clojure
 
@@ -101,10 +92,8 @@ Once we're in the ``dev`` namespace we can start the application:
   :duct.server.http.jetty/starting-server {:port 3000}
   :initiated
 
-The web server has been started on port 3000. Lets check it's running
-by sending it a HTTP request. This can be done from the command line
-with the standard curl_ or wget_ tools, but I prefer HTTPie_ for
-testing web services::
+웹 서버는 3000번 포트로 실행됩니다. HTTP 리퀘스트를 보내 잘 실행되었는지 확인해봅시다.
+보통 커맨드 라인에서 curl_\이나 wget_\으로 웹 서비스를 테스트 하지만 저는 HTTPie_\를 더 좋아합니다::
 
   $ http :3000
   HTTP/1.1 404 Not Found
@@ -117,8 +106,7 @@ testing web services::
       "error": "not-found"
   }
 
-We get a "not found" response, but this is expected as we've yet to
-add any routes to the application.
+"not found" 응답을 받았습니다. 하지만 아직 라우터를 추가하지 않았기 때문에 예상된 결과입니다.
 
 .. _Cursive:       https://cursive-ide.com/
 .. _Emacs:         https://www.gnu.org/software/emacs/
