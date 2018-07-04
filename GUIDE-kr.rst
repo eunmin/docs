@@ -568,25 +568,20 @@ And test::
 .. _URI templates: https://tools.ietf.org/html/rfc6570
 
 
-Code
+코드
 ~~~~
 
-So far we've seen how the configuration can be leveraged to produce
-applications in Duct. This works well when our needs are modest, but
-for most applications we're going to have to knuckle down and write
-some code.
+지금까지 Duct 애플리케이션을 만들기 만들기 위해 설정을 사용하는 방법에 대해 알아봤습니다.
+단순한 기능에는 이 방법으로 잘 동작하지만 대부분의 애플리케이션은 코드를 작성해야 합니다.
 
-While defining handlers using data has advantages, it's important not
-to take this too far. Treat the configuration as the skeleton of your
-application, and the code as the muscles and organs that drive it.
+데이터를 기반으로 핸들러를 정의하는 것은 장점이 있지만 너무 과하지 않도록 하는 것이 중요합니다.
+애플리케이션에서 설정은 골격으로 코드는 근육과 기관으로 생각하세요.
 
-
-Adding Users
+사용자 추가하기
 """"""""""""
 
-So far our application has been the single-user variety. Let's change
-that by adding a ``users`` table. First we'll add a reference to a new
-migration in the configuration:
+지금까지 사용자가 한명인 애플리케이션을 만들었습니다. 이제 ``users`` 테이블을 추가해서 바꿔 봅시다.
+먼저 설정에 새 마이그레이션 참조를 추가합니다:
 
 .. code-block:: edn
 
@@ -594,7 +589,7 @@ migration in the configuration:
   {:migrations [#ig/ref :todo.migration/create-entries
                 #ig/ref :todo.migration/create-users]}
 
-Then create the migration:
+다음에 마이그레이션을 만듭니다:
 
 .. code-block:: edn
 
@@ -602,7 +597,7 @@ Then create the migration:
   {:up ["CREATE TABLE users (id INTEGER PRIMARY KEY, email TEXT UNIQUE, password TEXT)"]
    :down ["DROP TABLE users"]}
 
-And ``reset`` to apply the new migration:
+다음은 새 마이그레이션을 적용하기 위해 ``reset``\을 실행합니다:
 
 .. code-block:: clojure
 
@@ -611,33 +606,29 @@ And ``reset`` to apply the new migration:
   :duct.migrator.ragtime/applying :todo.migration/create-users#66d6b1f8
   :resumed
 
-Now that we have a table to hold our users, we next need to provide a
-way for people to sign up to our web service. We could write a handler
-for this with the ``duct/handler.sql`` library, but good security
-practice tells us that we should avoid writing passwords directly to
-the database.
+이제 사용자를 저장할 테이블이 생겼으니 다음으로 사용자들이 웹 서비스에서 가입할 수 방법이 필요합니다.
+``duct/handler.sql`` 라이브러리로 핸들러를 만들 수 있지만 데이터베이스에 직접 비밀번호를 저장하는
+것은 보안에 좋지 않습니다.
 
-Instead, we'll be writing our own handler function, one that secures
-the password with a `key derivation function`_ or KDF. To do this, we
-first need to introduce a new dependency to the project file:
+대신 비밀번호 보안 방식 중 하나인 `key derivation function`_\(또는 KDF)를 이용해서 핸들러 함수를
+직접 만들어 봅시다. 먼저 아래와 같이 새로운 라이브러리를 프로젝트 디펜던시에 추가합니다:
 
 .. code-block:: clojure
 
   [buddy/buddy-hashers "1.3.0"]
 
-This is the library that we'll use to supply our KDF. Once the
-dependency is in place, exit the REPL:
+이 라이브러리를 추가하면 KDF를 사용할 수 있습니다. 디펜던시를 추가한 후에 REPL을 종료합니다:
 
 .. code-block:: clojure
 
   dev=> (exit)
   Bye for now!
 
-Then restart::
+그리고 다시 시작합니다::
 
   $ lein repl
 
-And start the application:
+다음은 애플리케이션을 시작합니다:
 
 .. code-block:: clojure
   user=> (dev)
@@ -646,8 +637,7 @@ And start the application:
   :duct.server.http.jetty/starting-server {:port 3000}
   :initiated
 
-Next we want to add in an additional Ataraxy route that allows users
-to be created:
+다음으로 사용자를 생성하기 위한 Ataraxy 라우터를 추가합니다:
 
 .. code-block:: edn
 
@@ -664,21 +654,18 @@ to be created:
    [:post "/users" {{:keys [email password]} :body-params}]
    [:users/create email password]}
 
-And we next write the handler configuration:
+그리고 핸들러 설정을 추가합니다:
 
 .. code-block:: edn
 
   :todo.handler.users/create
   {:db #ig/ref :duct.database/sql}
 
-You'll notice that this isn't a composite key; we're not using
-existing functionality, but instead we're going to write our own
-method.
+방금 추가한 설정에는 컴포지트 키를 사용하지 않았습니다. 왜냐하면 기존에 있는 기능이 아니고 새로운 기능을
+만들기 때문입니다.
 
-You might also notice that we're also including a reference to the
-database. All SQL database keys in Duct inherit from
-``:duct.database/sql``, so by using that key in the reference we're
-telling Duct to find the first available SQL database.
+그리고 데이터베이스 참조를 추가했습니다. Duct에 있는 모든 SQL 데이터베이스 키는 ``:duct.database/sql``\를
+상속 받습니다. Duct는 이 키를 이용해서 첫번째로 사용 가능한 SQL 데이터베이스를 찾습니다.
 
 You may wonder why the ``duct.handler.sql`` keys didn't include a
 database key. This is because they all inherit from the
