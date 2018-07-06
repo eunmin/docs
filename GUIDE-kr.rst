@@ -673,10 +673,9 @@ database key. This is because they all inherit from the
 ``:duct.module/sql`` module to automatically insert the reference. We
 could also do this, but for now we'll keep the reference explicit.
 
-It's now finally time to write the handler. The namespace of the
-keyword is ``todo.handler.users``, so we'll use that as the namespace
-for the code. Create a new file ``src/todo/handler/users.clj`` and add
-a namespace declaration:
+이제 핸들러 코드를 만들어 봅시다. 키워드에 사용한 네임스페이스는 ``todo.handler.users`` 입니다.
+그래서 코드에 네임스페이스도 같은 것을 사용하려고 합니다. ``src/todo/handler/users.clj`` 파일을
+만들고 네임스페이스를 선언합니다:
 
 .. code-block:: clojure
 
@@ -687,14 +686,11 @@ a namespace declaration:
               duct.database.sql
               [integrant.core :as ig]))
 
-Naturally we need ``buddy.hashers`` for our KDF, and we need
-``clojure.java.jdbc`` because we're accessing the database. The
-``integrant.core`` namespace is necessary because we're writing an
-Integrant multimethod, but the purpose of ``ataraxy.response`` and
-``duct.database.sql`` might be less obvious.
+KDF를 쓰기 위해 ``buddy.hashers``\가 필요하고 데이터베이스에 접근하기 위해 ``clojure.java.jdbc``\가
+필요합니다. ``integrant.core`` 네임스페이스는 Integrant 멀티메서드를 만들기 위해 필요하지만
+``ataraxy.response``\와 ``duct.database.sql``\는 추가하는 목적이 약간 명확하지 않습니다.
 
-Let's create the function to insert the new user into the database,
-and return the ID of the newly created row:
+이제 새 사용자를 데이터베이스에 추가하는 함수를 만들고 추가된 row 아이디를 리턴하도록 함수를 만들어봅시다:
 
 .. code-block:: clojure
 
@@ -708,19 +704,15 @@ and return the ID of the newly created row:
             results (jdbc/insert! db :users {:email email, :password pw-hash})]
         (-> results ffirst val))))
 
-If you're new to Duct, you might be surprised that we're using a
-protocol here. Why not just write a function? Why are we writing a
-protocol, then implementing it against this mysterious
-``duct.database.sql.Boundary`` type?
+Duct를 처음 사용한다면 여기에 프로토콜을 쓴다는 점이 생소할 것입니다. 왜 함수를 바로 쓰지 않죠?
+왜 이상한 ``duct.database.sql.Boundary`` 타입에 프로토콜을 구현을 하는거죠?
 
-The answer is that we *could* use a function, and it would certainly
-save us a few lines, but by using a protocol we gain the capability to
-mock out the database for testing or development. Duct provides an
-empty 'boundary' record, ``duct.database.sql.Boundary``, for this
-purpose. This is why we need to require the ``duct.database.sql``
-namespace, or the record will not be loaded.
+답은 분명히 함수를 *사용할 수* 있고 그러면 코드를 몇 줄 더 줄일 수 있습니다. 하지만 프로토콜을 사용하면
+개발이나 테스트 환경에 데이터베이스를 Mock으로 대체할 수 있다는 장점이 있습니다. 이런 이유로 Duct는
+``duct.database.sql.Boundary`` 라고 부르는 빈 '바운더리' 레코드를 제공합니다. 이것이 앞에서
+``duct.database.sql`` 네임스페이스를 포함시킨 이유입니다. 그렇지 않으면 레코드가 로드되지 않습니다.
 
-Finally, we write the ``init-key`` method for our keyword:
+마지막으로 create 키워드를 위한 ``init-key`` 메서드를 만듭니다:
 
 .. code-block:: clojure
 
@@ -729,11 +721,10 @@ Finally, we write the ``init-key`` method for our keyword:
       (let [id (create-user db email password)]
         [::response/created (str "/users/" id)])))
 
-Ataraxy allows a vector to be returned instead of the usual Ring
-response map. This is both a convenience, and an abstraction. Ataraxy
-will turn this into a ``201 Created`` response map for you.
+Ataraxy는 Ring 응답 맵 대신 백터를 리런 할 수 있습니다. 이 기능은 추상화와 편리함을 줍니다.
+Ataraxy는 ``201 Created`` 응답을 내려주게 됩니다.
 
-Let's ``reset``:
+이제 ``reset``\을 해봅시다:
 
 .. code-block:: clojure
 
@@ -741,7 +732,7 @@ Let's ``reset``:
   :reloading (todo.main todo.handler.users dev user)
   :resumed
 
-Then test it out::
+그리고 확인해봅니다::
 
   $ http post :3000/users email=bob@example.com password=hunter2
   HTTP/1.1 201 Created
@@ -751,44 +742,41 @@ Then test it out::
   Location: http://localhost:3000/users/1
   Server: Jetty(9.2.21.v20170120)
 
-We don't have any way of visualizing this information yet, so we need
-to take a look at the database.
+아직 어떤 시작적 정보도 없습니다. 이제 데이터베이스를 살펴볼 필요가 있습니다.
 
 .. _key derivation function: https://en.wikipedia.org/wiki/Key_derivation_function
 
 
-Querying the Database
+데이터베이스에 쿼리하기
 """""""""""""""""""""
 
-During development we likely want to query the database to ensure that
-the code we write is inserting the correct data. To make this process
-easier, we'll be adding to the ``dev`` namespace in
-``dev/src/dev.clj``.
 
-First, we want to require the ``clojure.java.jdbc`` namespace:
+개발을 하는 동안 우리가 작성한 코드가 데이터베이스에 데이터를 잘 넣고 있는지 확인할 필요가 있습니다.
+이 일을 쉽게 하기 위해 ``dev/src/dev.clj`` 파일에 ``dev`` 네임스페이스를 추가합시다.
+
+먼저 ``clojure.java.jdbc`` 네임스페이스가 필요합니다:
 
 .. code-block:: clojure
 
   [clojure.java.jdbc :as jdbc]
 
-Next we want a way of getting a database connection. Duct stores the
-running system in the ``system`` var during development. This allows
-us to write a simple function to retrieve a JDBC database spec:
+다음으로 데이터베이스 연결을 얻을 수 있어야 합니다. Duct는 개발하는 동안 ``system`` var에 동작하고
+있는 시스템 정보를 저장합니다. 그래서 JDBC 데이터베이스 스펙을 가져오는 간단한 함수를 아래와 같이 만들 수
+있습니다:
 
 .. code-block:: clojure
 
   (defn db []
     (-> system (ig/find-derived-1 :duct.database/sql) val :spec))
 
-Now that we can get the database, we can add a small function to help
-us query it:
+데이터베이스을 얻었으니 이제 쿼리를 도와주는 간단한 함수를 만들어 봅시다:
 
 .. code-block:: clojure
 
   (defn q [sql]
     (jdbc/query (db) sql))
 
-Once these changes are made, we ``reset``:
+다 했으면 ``reset``\을 실행해 줍니다:
 
 .. code-block:: clojure
 
@@ -796,7 +784,7 @@ Once these changes are made, we ``reset``:
   :reloading (dev)
   :resumed
 
-Then try querying our ``users`` table:
+다음에 ``users`` 테이블에 쿼리를 실행해 봅시다:
 
 .. code-block:: clojure
 
@@ -806,4 +794,4 @@ Then try querying our ``users`` table:
     :password
     "bcrypt+sha512$f4c1bc592ecd1869d0bf802f7c8f6e36$12$19a9ae3ed9118cb6cbfcd8c4a31aadb6b00162288b1fce50"})
 
-That certainly looks correct. We have an ID, email and an hashed password.
+잘 된 것 같습니다. ID, 이메일, 해쉬된 비밀번호가 있네요.
