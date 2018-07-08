@@ -146,14 +146,14 @@ Config 파일을 살펴보겠습니다:
    {}}
 
 정적 인덱스 라우트를 추가하는 것으로 시작할 수 있습니다.
-Ataraxy가 라우터이기 때문에 ``:duct.module/ataraxy` 를 한줄 추가합니다:
+Ataraxy가 라우터이기 때문에 ``:duct.module/ataraxy`` 를 한줄 추가합니다:
 
 .. code-block:: edn
 
   :duct.module/ataraxy
   {[:get "/"] [:index]}
 
-이것은 `[:get "/"]`경로를 ``[:index]``로 연결합니다.
+이것은 ``[:get "/"]`` 경로를 ``[:index]``로 연결합니다.
 Ataraxy 모듈은 자동으로 컨피그에서 이름과 일치하는 Ring 핸들러를 찾아 쌍을 이룹니다.
 결과 키가 ``:index``이기 때문에, 핸들러 키는 ``:todo.handler/index``가 됩니다.
 컨피그에 그 이름을 가진 엔트리를 추가해봅시다:
