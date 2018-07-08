@@ -231,7 +231,6 @@ up은 마이그레이션을, down은 롤백을 하게 됩니다.
 
 마이그레이션을 변경하고,``content`` 컬럼의 이름을``description``으로 바꿔봅시다:
 
-
 .. code-block:: edn
 
   [:duct.migrator.ragtime/sql :todo.migration/create-entries]
@@ -335,7 +334,7 @@ Ataraxy 모듈은 이 핸들러 이름이  ``:todo.handler.entries/list``이기�
   :reloading (todo.main dev user)
   :resumed
 
-그리고 HTTP 요청을 보내서 라우트를 확인합니다.::
+그리고 HTTP 요청을 보내서 라우트를 확인합니다::
 
   $ http :3000/entries
   HTTP/1.1 200 OK
@@ -373,7 +372,7 @@ Ataraxy 모듈은 이 핸들러 이름이  ``:todo.handler.entries/list``이기�
 
 관련된 핸들러를 작성할 때, 결과에서 정보를 가져올 수 있는 방법이 필요합니다.
 Ataraxy는 결과를 요청 맵의 ``:ataraxy/result``키에 넣습니다.
-그래서 새 앤트리의 설명을 찾기 위해 요청을 디스트럭처링 할 수 있습니다.:
+그래서 새 앤트리의 설명을 찾기 위해 요청을 디스트럭처링 할 수 있습니다:
 
 .. code-block:: edn
 
