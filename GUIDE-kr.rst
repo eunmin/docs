@@ -123,16 +123,15 @@ REPL을 시작합니다::
 Configuration
 ~~~~~~~~~~~~~
 
-덕트 어플리케이션은 edn_ 구성 파일 주위에 빌드됩니다.
+Duct 어플리케이션은 edn_ 컨피그 파일 주위에 빌드됩니다.
 이것은 어플리케이션의 구조와 디펜던시를 정의합니다.
-현 가이드에서 만든 프로젝트에서, 컨피그레이션 파일은 다음 위치에 있습니다.:
+이 가이드안에서 만든 프로젝트에서, 컨피그레이션 파일은 다음 위치에 있습니다:
 ``resources/todo/config.edn``.
 
-
-Adding a Static Route
+정적 라우트 추가하기
 """""""""""""""""""""
 
-Let's take a look at the configuration file:
+Config 파일을 살펴보겠습니다:
 
 .. code-block:: edn
 
@@ -146,34 +145,31 @@ Let's take a look at the configuration file:
    :duct.module/ataraxy
    {}}
 
-We're going to start by adding in a static index route, and to do that
-we're going to add to the ``:duct.module/ataraxy`` key, since Ataraxy
-is our router:
+정적 인덱스 라우트를 추가하는 것으로 시작할 수 있습니다.
+Ataraxy가 라우터이기 때문에 ``:duct.module/ataraxy` 를 한줄 추가합니다:
 
 .. code-block:: edn
 
   :duct.module/ataraxy
   {[:get "/"] [:index]}
 
-This connects a route ``[:get "/"]`` with a result ``[:index]``. The
-Ataraxy module automatically looks for a Ring handler in the
-configuration with a matching name to pair with the result. Since the
-result key is ``:index``, the handler key is ``:todo.handler/index``.
-Let's add in a configuration entry with that name:
+이것은 `[:get "/"]`경로를 ``[:index]``로 연결합니다.
+Ataraxy 모듈은 자동으로 컨피그에서 이름과 일치하는 Ring 핸들러를 찾아 쌍을 이룹니다.
+결과 키가 ``:index``이기 때문에, 핸들러 키는 ``:todo.handler/index``가 됩니다.
+컨피그에 그 이름을 가진 엔트리를 추가해봅시다:
 
 .. code-block:: edn
 
   [:duct.handler.static/ok :todo.handler/index]
   {:body {:entries "/entries"}}
 
-This time we're using a vector as the key; in Duct parlance, this is
-known as a *composite key*. Composite keys inherit the properties of
-all the keywords contained in them; because the vector contains the
-key ``:duct.handler.static/ok``, the configuration entry produces a
-static handler.
+이번에는 벡터를 키로 사용합니다; Duct에서는 이것을 *복합 (composite key)* 라고 합니다.
+복합 키는 복합 키에 속한 모든 키워드의 속성을 상속 받습니다;
+벡터에 ``: duct.handler.static / ok``가 포함되어 있기 때문에,
+컨프리크에션 엔트리가 정적 핸들러를 생성합니다.
 
-Let's apply this change to the application. Go to back to the REPL and
-run:
+이 변경사항을 어플리케이션에 적용해 보겠습니다.
+레플로 돌아가서 실행해보세요:
 
 .. code-block:: clojure
 
@@ -181,8 +177,8 @@ run:
   :reloading (todo.main dev user)
   :resumed
 
-This reloads the configuration and any changed files. When we send a
-HTTP request to the web server, we now get the expected response::
+이것은 컨피그 와 변경된 파일을 재로드합니다.
+이제는 웹 서버에 요청을 보내, 예상된 응답을 받습니다::
 
   $ http :3000
   HTTP/1.1 200 OK
@@ -197,14 +193,14 @@ HTTP request to the web server, we now get the expected response::
 
 .. _edn: https://github.com/edn-format/edn
 
-Adding a Database Migration
+데이터 마이그레이션 추가하기
 """""""""""""""""""""""""""
 
-We want to begin adding more dynamic routes, but before we can we need
-to create our database schema. Duct uses Ragtime_ for migrations, and
-each migration is defined in the configuration.
+더 많은 동적 라우트를 추가하고 싶지만, 그전에 데이터베이스 스키마를 생성해야합니다.
+Duct는 Ragtime_ 을 사용해 마이그레이션을 하고,
+각 마이그레이션은 컨피그에서 정의됩니다.
 
-Add two more keys to the configuration:
+컨피그에 두 개의 키를 더 추가합니다.
 
 .. code-block:: edn
 
@@ -215,13 +211,12 @@ Add two more keys to the configuration:
   {:up ["CREATE TABLE entries (id INTEGER PRIMARY KEY, content TEXT)"]
    :down ["DROP TABLE entries"]}
 
-The ``:duct.migrator/ragtime`` key contains an ordered list of
-migrations. Individual migrations can be defined by including
-``:duct.migrator.ragtime/sql`` in a composite key. The ``:up`` and
-``:down`` options contains vectors of SQL to execute; the former to
-apply the migration, the latter to roll it back.
+``:duct.migrator/ragtime``키는 마이그레이션을 순서대로 가집니다.
+각 마이그레이션은 복합키에서 ``:duct.migrator.ragtime/sql``을 포함시켜 정의할 수 있습니다.
+``:up``과 ``:down`` 옵션은 실행할 SQL의 벡터를 가집니다;
+up은 마이그레이션을, down은 롤백을 하게 됩니다.
 
-To apply the migration we run ``reset`` again at the REPL:
+마이그레이션을 위해서 REPL에서 ``reset``을 다시 실행합니다:
 
 .. code-block:: clojure
 
@@ -230,13 +225,12 @@ To apply the migration we run ``reset`` again at the REPL:
   :duct.migrator.ragtime/applying :todo.migration/create-entries#b34248fc
   :resumed
 
-Suppose after applying the migration we change our mind about the
-schema. We could write another migration, but if we haven't committed
-the code or deployed it to production it's often more convenient to
-edit the migration we have.
+마이그레이션을 적용한 이후에 스키마를 바꾸기로 했다고 가정해보겠습니다.
+다른 마이그레이션을 새로 작성해볼수도 있지만, 코드가 커밋이 안되었거나 프로덕션에 배포하지 않은경우
+가지고 있던 마이그레이션을 편집하는 것이 좀더 편리합니다.
 
-Let's change the migration and rename the ``content`` column to
-``description``:
+마이그레이션을 변경하고,``content`` 컬럼의 이름을``description``으로 바꿔봅시다:
+
 
 .. code-block:: edn
 
@@ -244,7 +238,7 @@ Let's change the migration and rename the ``content`` column to
   {:up ["CREATE TABLE entries (id INTEGER PRIMARY KEY, description TEXT)"]
    :down ["DROP TABLE entries"]}
 
-Then ``reset``:
+그리고 ``reset``:
 
 .. code-block:: clojure
 
@@ -254,36 +248,34 @@ Then ``reset``:
   :duct.migrator.ragtime/applying :todo.migration/create-entries#5c2bb12a
   :resumed
 
-The old version of the migration is automatically rolled back, and the
-new version of the migration applied in its place.
+이전 버전의 이전은 자동으로 롤백되고 새 버전의 마이그레이션이 대신 적용됩니다.
 
 .. _Ragtime: https://github.com/weavejester/ragtime
 
-Running Database Migrations in Production
+프로덕션 환경에서 데이터베이스 마이그레이션 하기
 """""""""""""""""""""""""""""""""""""""""
 
-We can easily run migrations in production::
+프로덕션 환경에서도 쉽게 마이그레이션을 할 수 있습니다::
 
   $ lein run :duct/migrator
 
-If you are using Heroku for deployment, this can easily be added to the release phase via your Procfile::
+개발에서 Heroku를 쓰고 있다면, Procfile을 통해 릴리즈 단계에 쉽게 추가해볼수 있습니다.
 
   web: java -jar target/sstandalone.jar
   release: lein run :duct/migrator
 
-Adding a Query Route
+쿼리 라우트 추가하기
 """"""""""""""""""""
 
-Now that we have a database table, it's time to write some routes to
-query it. To do this, we're going to use a library called
-``duct/handler.sql``, which should be added to the ``:dependencies``
-key in your ``project.clj`` file:
+이제 데이터베이스 테이블이 생겼으므로 쿼리 라우트를 작성해야합니다.
+``duct/handler.sql``라고 불리는 라이브러리를 사용할 것입니다.
+이것은 ``project.clj``파일의 ``:dependencies``키에 추가돼야 합니다::
 
 .. code-block:: clojure
 
   [duct/handler.sql "0.3.1"]
 
-Your dependencies should now look something like:
+디펜던시는 이제 다음과 같이 보일 것입니다 :
 
 .. code-block:: clojure
 
@@ -296,19 +288,19 @@ Your dependencies should now look something like:
                  [duct/module.sql "0.4.2"]
                  [org.xerial/sqlite-jdbc "3.20.1"]]
 
-Adding dependencies is one of the few times we have to restart the
-REPL. So first we exit:
+REPL을 다시 시작해야하는 하는 몇가지 이유중 하나는,
+디펜던시를 추가해야할 때이므로 일단 REPL에서 빠져나옵니다.
 
 .. code-block:: clojure
 
   dev=> (exit)
   Bye for now!
 
-Then we restart::
+그리고 다시 시작합니다::
 
   $ lein repl
 
-And start the application running again:
+그리고 어플리케이션을 다시 실행합니다::
 
 .. code-block:: clojure
   user=> (dev)
@@ -317,8 +309,8 @@ And start the application running again:
   :duct.server.http.jetty/starting-server {:port 3000}
   :initiated
 
-We can now turn back to the project configuration. Let's start by
-adding a new Ataraxy route:
+이제 프로젝트 컨피그레이션으로 돌아갈 수 있습니다.
+새로운 Ataraxy 라우트를 추가하는 것으로 시작해봅시다:
 
 .. code-block:: edn
 
@@ -326,17 +318,16 @@ adding a new Ataraxy route:
   {[:get "/"]        [:index]
    [:get "/entries"] [:entries/list]}
 
-As before, the result ``[:entries/list]`` needs to be paired with an
-appropriately named Ring handler. The Ataraxy module expects this
-handler to be named ``:todo.handler.entries/list``, so we'll use that
-name, along with the ``:duct.handler.sql/query`` key:
+앞서 본 것과 같이, ``[:entries/list]``는 적절하게 이름 붙여진 Ring 핸들러와 쌍을 이뤄야합니다.
+Ataraxy 모듈은 이 핸들러 이름이  ``:todo.handler.entries/list``이기를 기대하기 때문에,
+``:duct.handler.sql/query``키와 함께 그 이름을 사용할 것입니다:
 
 .. code-block:: edn
 
   [:duct.handler.sql/query :todo.handler.entries/list]
   {:sql ["SELECT * FROM entries"]}
 
-Once the handler is defined in the configuration, we can ``reset``:
+일단 핸들러가 컨피그에서 정의되면, ``reset``을 할 수 있습니다 :
 
 .. code-block:: clojure
 
@@ -344,7 +335,7 @@ Once the handler is defined in the configuration, we can ``reset``:
   :reloading (todo.main dev user)
   :resumed
 
-Then we check the route by sending a HTTP request to it::
+그리고 HTTP 요청을 보내서 라우트를 확인합니다.::
 
   $ http :3000/entries
   HTTP/1.1 200 OK
@@ -355,18 +346,18 @@ Then we check the route by sending a HTTP request to it::
 
   []
 
-We get a valid, though empty response. This makes sense, as we've yet
-to populate the ``entries`` table with any data.
+유효한 응답이지만, 비어있는 응답입니다.
+``entries``테이블에 아무런 데이터도 넣지 않았기 때문인 것을 알수 있습니다.
 
 
-Adding an Update Route
+업데이트 라우트 추가하기
 """"""""""""""""""""""
 
-Next we'd like to add a route that updates the database. Again we're
-going to be making use of the ``duct/handler.sql`` library, but both
-the route and handler are going to be more complex.
+다음으로는 데이터베이스를 업데이트 하는 라우트를 추가하려고합니다.
+다시 ``duct/handler.sql``라이브러리를 사용할 것이지만,
+라우트와 핸들러는 더 복잡해 질 것입니다.
 
-First, the new route:
+일단, 새로운 라우트입니다:
 
 .. code-block:: edn
 
@@ -377,14 +368,12 @@ First, the new route:
    [:post "/entries" {{:keys [description]} :body-params}]
    [:entries/create description]}
 
-The new Ataraxy route not only matches the method and URI of the
-request, it also destructures the request body and places the
-description of the todo entry into the result.
+새로운 Ataraxy 라우트는 요청의 메소드와 URI를 일치시킬뿐만 아니라,
+요청의 body를 디스트럭처링 하고 todo 엔트리에 설명도 넣을 수 있습니다.
 
-When we come to write the associated handler, we need some way of
-getting the information from the result. Ataraxy places the result
-into the ``:ataraxy/result`` key on the request map, so we can
-destructure the request to find the description of the new entry:
+관련된 핸들러를 작성할 때, 결과에서 정보를 가져올 수 있는 방법이 필요합니다.
+Ataraxy는 결과를 요청 맵의 ``:ataraxy/result``키에 넣습니다.
+그래서 새 앤트리의 설명을 찾기 위해 요청을 디스트럭처링 할 수 있습니다.:
 
 .. code-block:: edn
 
@@ -392,7 +381,7 @@ destructure the request to find the description of the new entry:
   {:request {[_ description] :ataraxy/result}
    :sql     ["INSERT INTO entries (description) VALUES (?)" description]}
 
-Next we ``reset``:
+그리고 ``reset``:
 
 .. code-block:: clojure
 
@@ -400,7 +389,7 @@ Next we ``reset``:
   :reloading (todo.main dev user)
   :resumed
 
-And test::
+그리고 테스트::
 
   $ http post :3000/entries description="Write Duct guide"
   HTTP/1.1 201 Created
@@ -424,17 +413,16 @@ And test::
       }
   ]
 
-We can now have the bare bones of a useful application.
+이제 쓸만한 어플리케이션의 뼈대가 생겼습니다.
 
-
-Becoming More RESTful
+좀 더 RESTful하게 만들기
 """""""""""""""""""""
 
-We can now GET and POST to lists of entries for our Todo application,
-but ideally we'd also like to DELETE particular entries as well. In
-order to do that, each entry needs to have a distinct URI.
+이제 엔트리의 목록에 GET과 POST를 Todo 어플리케이션에 날려볼 수 있지만,
+DELETE도 만들어봅시다.
+이를 위해서는 각 엔트리가 고유한 URI를 가져야합니다.
 
-Let's start by adding some hypertext references to our list handler:
+리스트 핸들러에 하이퍼텍스트 참조를 추가해봅시다.
 
 .. code-block:: edn
 
@@ -442,8 +430,9 @@ Let's start by adding some hypertext references to our list handler:
   {:sql   ["SELECT * FROM entries"]
    :hrefs {:href "/entries/{id}"}}
 
-The ``:hrefs`` option allows hypertext references to be added to the
-response using `URI templates`_. If we ``reset``:
+``:hrefs``옵션은 `URI templates`_을 사용해
+응답에 하이퍼텍스트 참조를 추가할 수 있게합니다.
+ ``reset``을 하면:
 
 .. code-block:: clojure
 
@@ -451,7 +440,7 @@ response using `URI templates`_. If we ``reset``:
   :reloading (todo.main dev user)
   :resumed
 
-And test::
+그리고 테스트::
 
   $ http :3000/entries
   HTTP/1.1 200 OK
@@ -468,8 +457,8 @@ And test::
       }
   ]
 
-We can see that each list entry now has a new key. Let's write two new
-Ataraxy routes:
+이제 각 리스트 엔트리에 새 키가 생긴 것을 볼 수 있습니다.
+투가지 새로운 Ataraxy 라우트를 작성해보겠습니다:
 
 .. code-block:: edn
 
@@ -483,12 +472,10 @@ Ataraxy routes:
    [:get    "/entries/" id] [:entries/find    ^int id]
    [:delete "/entries/" id] [:entries/destroy ^int id]}
 
-These routes show how we can pull data out of the URI, and coerce it
-into a new type.
+이 라우트는 URI에서 데이터를 가져와서, 새로운 타입으로 강제하는 방법을 보여줍니다.
 
-The routes require associated handlers. As before, we'll make use of
-the `duct/handler.sql` library, using the `query-one` and `execute`
-handler types:
+라우트에는 관련된 핸들러가 필요합니다. 앞서 나온 `duct/handler.sql` 라이브러리의
+`query-one` 와 `execute` 핸들러 타입을사용해봅니다:
 
 .. code-block:: edn
 
@@ -502,8 +489,7 @@ handler types:
    :sql     ["DELETE FROM entries WHERE id = ?" id]}
 
 
-We also want to improve the entry creation route and give it a
-`Location` header to the resource it creates:
+또한 엔트리 생성 라우트를 개선하고, `Location`를 제공해 리소스를 생성할 수 있습니다:
 
 .. code-block:: edn
 
@@ -512,11 +498,10 @@ We also want to improve the entry creation route and give it a
    :sql      ["INSERT INTO entries (description) VALUES (?)" description]
    :location "/entries/{last_insert_rowid}"}
 
-The `last_insert_rowid` is a resultset column specific to
-SQLite. Other databases will return the generated row ID in different
-ways.
+`last_insert_rowid`는 SQLite에서만 사용하는 결과 집합 컬럼입니다.
+다른 데이터베이스는 생성된 row별 ID를 다른 방식으로 반환합니다.
 
-With all that done we `reset`:
+완료했으면 `reset`을 합니다 :
 
 .. code-block:: clojure
 
@@ -524,7 +509,7 @@ With all that done we `reset`:
   :reloading ()
   :resumed
 
-And test::
+그리고 테스트::
 
   $ http :3000/entries/1
   HTTP/1.1 200 OK
