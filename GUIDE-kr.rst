@@ -153,10 +153,10 @@ Ataraxy가 라우터이기 때문에 ``:duct.module/ataraxy`` 를 한줄 추가�
   :duct.module/ataraxy
   {[:get "/"] [:index]}
 
-이것은 ``[:get "/"]`` 경로를 ``[:index]``로 연결합니다.
-Ataraxy 모듈은 자동으로 컨피그에서 이름과 일치하는 Ring 핸들러를 찾아 쌍을 이룹니다.
-결과 키가 ``:index``이기 때문에, 핸들러 키는 ``:todo.handler/index``가 됩니다.
-컨피그에 그 이름을 가진 엔트리를 추가해봅시다:
+  이것은 ``[:get "/"]`` 경로를 ``[:index]`` 로 연결합니다.
+  Ataraxy 모듈은 자동으로 컨피그에서 이름과 일치하는 Ring 핸들러를 찾아 쌍을 이룹니다.
+  결과 키가 ``:index`` 이기 때문에, 핸들러 키는 ``:todo.handler/index`` 가 됩니다.
+  컨피그에 그 이름을 가진 엔트리를 추가해봅시다:
 
 .. code-block:: edn
 
@@ -165,7 +165,7 @@ Ataraxy 모듈은 자동으로 컨피그에서 이름과 일치하는 Ring 핸�
 
 이번에는 벡터를 키로 사용합니다; Duct에서는 이것을 *복합 (composite key)* 라고 합니다.
 복합 키는 복합 키에 속한 모든 키워드의 속성을 상속 받습니다;
-벡터에 ``:duct.handler.static/ok``가 포함되어 있기 때문에,
+벡터에 ``:duct.handler.static/ok`` 가 포함되어 있기 때문에,
 컨피그레이션 엔트리가 정적 핸들러를 생성합니다.
 
 이 변경사항을 어플리케이션에 적용해 보겠습니다.
@@ -211,12 +211,12 @@ Duct는 Ragtime_ 을 사용해 마이그레이션을 하고,
   {:up ["CREATE TABLE entries (id INTEGER PRIMARY KEY, content TEXT)"]
    :down ["DROP TABLE entries"]}
 
-``:duct.migrator/ragtime``키는 마이그레이션을 순서대로 가집니다.
-각 마이그레이션은 복합키에서 ``:duct.migrator.ragtime/sql``을 포함시켜 정의할 수 있습니다.
-``:up``과 ``:down`` 옵션은 실행할 SQL의 벡터를 가집니다;
+``:duct.migrator/ragtime`` 키는 마이그레이션을 순서대로 가집니다.
+각 마이그레이션은 복합키에서 ``:duct.migrator.ragtime/sql`` 을 포함시켜 정의할 수 있습니다.
+``:up`` 과 ``:down`` 옵션은 실행할 SQL의 벡터를 가집니다;
 up은 마이그레이션을, down은 롤백을 하게 됩니다.
 
-마이그레이션을 위해서 REPL에서 ``reset``을 다시 실행합니다:
+마이그레이션을 위해서 REPL에서 ``reset`` 을 다시 실행합니다:
 
 .. code-block:: clojure
 
@@ -229,7 +229,7 @@ up은 마이그레이션을, down은 롤백을 하게 됩니다.
 다른 마이그레이션을 새로 작성해볼수도 있지만, 코드가 커밋이 안되었거나 프로덕션에 배포하지 않은경우
 가지고 있던 마이그레이션을 편집하는 것이 좀더 편리합니다.
 
-마이그레이션을 변경하고,``content`` 컬럼의 이름을``description``으로 바꿔봅시다:
+마이그레이션을 변경하고,``content`` 컬럼의 이름을``description`` 으로 바꿔봅시다:
 
 .. code-block:: edn
 
@@ -267,8 +267,8 @@ up은 마이그레이션을, down은 롤백을 하게 됩니다.
 """"""""""""""""""""
 
 이제 데이터베이스 테이블이 생겼으므로 쿼리 라우트를 작성해야합니다.
-``duct/handler.sql``라고 불리는 라이브러리를 사용할 것입니다.
-이것은 ``project.clj``파일의 ``:dependencies``키에 추가돼야 합니다::
+``duct/handler.sql`` 라고 불리는 라이브러리를 사용할 것입니다.
+이것은 ``project.clj`` 파일의 ``:dependencies`` 키에 추가돼야 합니다::
 
 .. code-block:: clojure
 
@@ -317,16 +317,16 @@ REPL을 다시 시작해야하는 하는 몇가지 이유중 하나는,
   {[:get "/"]        [:index]
    [:get "/entries"] [:entries/list]}
 
-앞서 본 것과 같이, ``[:entries/list]``는 적절하게 이름 붙여진 Ring 핸들러와 쌍을 이뤄야합니다.
-Ataraxy 모듈은 이 핸들러 이름이  ``:todo.handler.entries/list``이기를 기대하기 때문에,
-``:duct.handler.sql/query``키와 함께 그 이름을 사용할 것입니다:
+앞서 본 것과 같이, ``[:entries/list]`` 는 적절하게 이름 붙여진 Ring 핸들러와 쌍을 이뤄야합니다.
+Ataraxy 모듈은 이 핸들러 이름이  ``:todo.handler.entries/list`` 이기를 기대하기 때문에,
+``:duct.handler.sql/query`` 키와 함께 그 이름을 사용할 것입니다:
 
 .. code-block:: edn
 
   [:duct.handler.sql/query :todo.handler.entries/list]
   {:sql ["SELECT * FROM entries"]}
 
-일단 핸들러가 컨피그에서 정의되면, ``reset``을 할 수 있습니다 :
+일단 핸들러가 컨피그에서 정의되면, ``reset`` 을 할 수 있습니다 :
 
 .. code-block:: clojure
 
@@ -346,14 +346,14 @@ Ataraxy 모듈은 이 핸들러 이름이  ``:todo.handler.entries/list``이기�
   []
 
 유효한 응답이지만, 비어있는 응답입니다.
-``entries``테이블에 아무런 데이터도 넣지 않았기 때문인 것을 알수 있습니다.
+``entries`` 테이블에 아무런 데이터도 넣지 않았기 때문인 것을 알수 있습니다.
 
 
 업데이트 라우트 추가하기
 """"""""""""""""""""""
 
 다음으로는 데이터베이스를 업데이트 하는 라우트를 추가하려고합니다.
-다시 ``duct/handler.sql``라이브러리를 사용할 것이지만,
+다시 ``duct/handler.sql`` 라이브러리를 사용할 것이지만,
 라우트와 핸들러는 더 복잡해 질 것입니다.
 
 일단, 새로운 라우트입니다:
@@ -371,7 +371,7 @@ Ataraxy 모듈은 이 핸들러 이름이  ``:todo.handler.entries/list``이기�
 요청의 body를 디스트럭처링 하고 todo 엔트리에 설명도 넣을 수 있습니다.
 
 관련된 핸들러를 작성할 때, 결과에서 정보를 가져올 수 있는 방법이 필요합니다.
-Ataraxy는 결과를 요청 맵의 ``:ataraxy/result``키에 넣습니다.
+Ataraxy는 결과를 요청 맵의 ``:ataraxy/result`` 키에 넣습니다.
 그래서 새 앤트리의 설명을 찾기 위해 요청을 디스트럭처링 할 수 있습니다:
 
 .. code-block:: edn
@@ -429,9 +429,9 @@ DELETE도 만들어봅시다.
   {:sql   ["SELECT * FROM entries"]
    :hrefs {:href "/entries/{id}"}}
 
-``:hrefs``옵션은 `URI templates`_을 사용해
+``:hrefs`` 옵션은 `URI templates`_을 사용해
 응답에 하이퍼텍스트 참조를 추가할 수 있게합니다.
- ``reset``을 하면:
+ ``reset`` 을 하면:
 
 .. code-block:: clojure
 
