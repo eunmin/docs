@@ -7,8 +7,8 @@ Duct Framework 가이드
 Duct는 Clojure_ 프로그래밍 언어로 서버 애플리케이션을 만들기 위한 data-driven 프레임워크입니다.
 이 가이드는 웹 애플리케이션 중점을 두고 Duct 사용법을 자세히 설명하기 위해 섰습니다.
 
-또 이 가이드는 Leiningen_ 이 설치되어 있고 Clojure 실무 지식이 있다는 가정을 하고 썼습니다.
-꼭 필요한 것은 아니지만 Ring_의 기초적인 부분을 알고 있으면 좋습니다.
+또 이 가이드는 Leiningen_\이 설치되어 있고 Clojure 실무 지식이 있다는 가정을 하고 썼습니다.
+꼭 필요한 것은 아니지만 Ring_\의 기초적인 부분을 알고 있으면 좋습니다.
 
 .. _Clojure:   https://clojure.org/
 .. _Leiningen: https://leiningen.org/
@@ -28,61 +28,53 @@ Duct Leiningen 템플릿으로 바로 시작해 볼 수 있습니다. Duct로 �
 
   $ lein new duct todo +api +ataraxy +sqlite
 
-결과는 이렇게 나옵니다::
+이런 결과가 나옵니다::
 
   Generating a new Duct project named todo...
   Run 'lein duct setup' in the project directory to create local config files.
 
-The parameters prefixed by ``+`` are profile hints, which are used to
-tell the template we want to build a web service (``+api``), using the
-Ataraxy_ routing library (``+ataraxy``), against a SQLite database
-(``+sqlite``).
+``+``\로 시작하는 파라미터는 프로필 힌트로 웹 서비스 (``+api``)와 Ataraxy_ 라우팅 라이브러리
+(``+ataraxy``), SQLite 데이터베이스 (``+sqlite``)를 사용하는 프로젝트를 만들어 줍니다.
 
-If you want to see what profile hints there are available, you can
-run::
+사용할 수 있는 프로필 힌트를 모두 보려면 아래 명령어를 실행합니다::
 
   $ lein new :show duct
 
-For now, let's change directory into the ``todo`` project that has
-been created::
+이제 조금 전에 만든 ``todo`` 프로젝트 디렉터리로 들어가 봅시다::
 
   $ cd todo
 
-Then run the local setup::
+그리고 로컬 셑업을 실행합니다::
 
   $ lein duct setup
 
-This creates four files that should be kept out of source control::
+그러면 소스 컨트롤에는 제외되어 있는 파일 4개가 생깁니다::
 
   Created profiles.clj
   Created .dir-locals.el
   Created dev/resources/local.edn
   Created dev/src/local.clj
 
-If you're using Git_, then these files are already added to your
-``.gitignore`` file. If you're using another version control system,
-then you'll need to manually update your ignore files.
+Git_\을 사용하면 이 파일들은 ``.gitignore``\에 추가되어 있습니다. 하지만 다른 소스 컨트롤을 사용한다면
+소스 컨트롤에 관리되지 않도록 수동으로 처리해줘야 합니다.
 
 .. _SQLite:  https://sqlite.org/
 .. _Ataraxy: https://github.com/weavejester/ataraxy
 .. _Git:     https://git-scm.com/
 
 
-Starting the REPL
+REPL 시작하기
 """""""""""""""""
 
-Duct development is orientated around the REPL. It's recommended that
-you use an editor with REPL integration, such as Cursive_, Emacs_ with
-CIDER_, Vim_ with `fireplace.vim`_, or Atom_ with `Proto REPL`_.
-However, this guide doesn't require editor integration, and the
-instructions will assume you're working directly from the command
-line.
+Duct는 REPL을 중심으로 개발 하도록 되어 있습니다. 그래서 Cursive_\나 Emacs_\의 CIDER_, Vim_\의
+`fireplace.vim`_, Atom_\의 `Proto REPL`_\같은 에디터 REPL 통합 환경을 사용하는 것을 추천합니다.
+하지만 이 가이드에서는 에디터 통합 없이 커맨드 라인에서 직접 실행해볼 수 있도록 되어 있습니다.
 
-So start the REPL with::
+REPL을 시작합니다::
 
   $ lein repl
 
-At the prompt, we'll first load the development environment:
+먼저 개발 환경을 로드하기 위해 프롬프트에 다음과 같이 입력합니다:
 
 .. code-block:: clojure
 
@@ -90,10 +82,9 @@ At the prompt, we'll first load the development environment:
   :loaded
   dev=>
 
-This isn't loaded automatically, as errors in the development could
-cause the REPL not to start.
+개발 환경에 에러가 있는 경우 REPL이 실행되지 않을 수 있기 때문에 개발 환경은 자동으로 로드하지 않습니다.
 
-Once we're in the ``dev`` namespace we can start the application:
+``dev`` 네임스페이스에 들어오면 애플리케이션을 실행해볼 수 있습니다:
 
 .. code-block:: clojure
 
@@ -101,10 +92,8 @@ Once we're in the ``dev`` namespace we can start the application:
   :duct.server.http.jetty/starting-server {:port 3000}
   :initiated
 
-The web server has been started on port 3000. Lets check it's running
-by sending it a HTTP request. This can be done from the command line
-with the standard curl_ or wget_ tools, but I prefer HTTPie_ for
-testing web services::
+웹 서버는 3000번 포트로 실행됩니다. HTTP 리퀘스트를 보내 잘 실행되었는지 확인해봅시다.
+보통 커맨드 라인에서 curl_\이나 wget_\으로 웹 서비스를 테스트 하지만 저는 HTTPie_\를 더 좋아합니다::
 
   $ http :3000
   HTTP/1.1 404 Not Found
@@ -117,8 +106,7 @@ testing web services::
       "error": "not-found"
   }
 
-We get a "not found" response, but this is expected as we've yet to
-add any routes to the application.
+"not found" 응답을 받았습니다. 하지만 아직 라우터를 추가하지 않았기 때문에 예상된 결과입니다.
 
 .. _Cursive:       https://cursive-ide.com/
 .. _Emacs:         https://www.gnu.org/software/emacs/
@@ -580,25 +568,20 @@ And test::
 .. _URI templates: https://tools.ietf.org/html/rfc6570
 
 
-Code
+코드
 ~~~~
 
-So far we've seen how the configuration can be leveraged to produce
-applications in Duct. This works well when our needs are modest, but
-for most applications we're going to have to knuckle down and write
-some code.
+지금까지 Duct 애플리케이션을 만들기 만들기 위해 설정을 사용하는 방법에 대해 알아봤습니다.
+단순한 기능에는 이 방법으로 잘 동작하지만 대부분의 애플리케이션은 코드를 작성해야 합니다.
 
-While defining handlers using data has advantages, it's important not
-to take this too far. Treat the configuration as the skeleton of your
-application, and the code as the muscles and organs that drive it.
+데이터를 기반으로 핸들러를 정의하는 것은 장점이 있지만 너무 과하지 않도록 하는 것이 중요합니다.
+애플리케이션에서 설정은 골격으로 코드는 근육과 기관으로 생각하세요.
 
-
-Adding Users
+사용자 추가하기
 """"""""""""
 
-So far our application has been the single-user variety. Let's change
-that by adding a ``users`` table. First we'll add a reference to a new
-migration in the configuration:
+지금까지 사용자가 한명인 애플리케이션을 만들었습니다. 이제 ``users`` 테이블을 추가해서 바꿔 봅시다.
+먼저 설정에 새 마이그레이션 참조를 추가합니다:
 
 .. code-block:: edn
 
@@ -606,7 +589,7 @@ migration in the configuration:
   {:migrations [#ig/ref :todo.migration/create-entries
                 #ig/ref :todo.migration/create-users]}
 
-Then create the migration:
+다음에 마이그레이션을 만듭니다:
 
 .. code-block:: edn
 
@@ -614,7 +597,7 @@ Then create the migration:
   {:up ["CREATE TABLE users (id INTEGER PRIMARY KEY, email TEXT UNIQUE, password TEXT)"]
    :down ["DROP TABLE users"]}
 
-And ``reset`` to apply the new migration:
+다음은 새 마이그레이션을 적용하기 위해 ``reset``\을 실행합니다:
 
 .. code-block:: clojure
 
@@ -623,33 +606,29 @@ And ``reset`` to apply the new migration:
   :duct.migrator.ragtime/applying :todo.migration/create-users#66d6b1f8
   :resumed
 
-Now that we have a table to hold our users, we next need to provide a
-way for people to sign up to our web service. We could write a handler
-for this with the ``duct/handler.sql`` library, but good security
-practice tells us that we should avoid writing passwords directly to
-the database.
+이제 사용자를 저장할 테이블이 생겼으니 다음으로 사용자들이 웹 서비스에서 가입할 수 방법이 필요합니다.
+``duct/handler.sql`` 라이브러리로 핸들러를 만들 수 있지만 데이터베이스에 직접 비밀번호를 저장하는
+것은 보안에 좋지 않습니다.
 
-Instead, we'll be writing our own handler function, one that secures
-the password with a `key derivation function`_ or KDF. To do this, we
-first need to introduce a new dependency to the project file:
+대신 비밀번호 보안 방식 중 하나인 `key derivation function`_\(또는 KDF)를 이용해서 핸들러 함수를
+직접 만들어 봅시다. 먼저 아래와 같이 새로운 라이브러리를 프로젝트 디펜던시에 추가합니다:
 
 .. code-block:: clojure
 
   [buddy/buddy-hashers "1.3.0"]
 
-This is the library that we'll use to supply our KDF. Once the
-dependency is in place, exit the REPL:
+이 라이브러리를 추가하면 KDF를 사용할 수 있습니다. 디펜던시를 추가한 후에 REPL을 종료합니다:
 
 .. code-block:: clojure
 
   dev=> (exit)
   Bye for now!
 
-Then restart::
+그리고 다시 시작합니다::
 
   $ lein repl
 
-And start the application:
+다음은 애플리케이션을 시작합니다:
 
 .. code-block:: clojure
   user=> (dev)
@@ -658,8 +637,7 @@ And start the application:
   :duct.server.http.jetty/starting-server {:port 3000}
   :initiated
 
-Next we want to add in an additional Ataraxy route that allows users
-to be created:
+다음으로 사용자를 생성하기 위한 Ataraxy 라우터를 추가합니다:
 
 .. code-block:: edn
 
@@ -676,21 +654,18 @@ to be created:
    [:post "/users" {{:keys [email password]} :body-params}]
    [:users/create email password]}
 
-And we next write the handler configuration:
+그리고 핸들러 설정을 추가합니다:
 
 .. code-block:: edn
 
   :todo.handler.users/create
   {:db #ig/ref :duct.database/sql}
 
-You'll notice that this isn't a composite key; we're not using
-existing functionality, but instead we're going to write our own
-method.
+방금 추가한 설정에는 컴포지트 키를 사용하지 않았습니다. 왜냐하면 기존에 있는 기능이 아니고 새로운 기능을
+만들기 때문입니다.
 
-You might also notice that we're also including a reference to the
-database. All SQL database keys in Duct inherit from
-``:duct.database/sql``, so by using that key in the reference we're
-telling Duct to find the first available SQL database.
+그리고 데이터베이스 참조를 추가했습니다. Duct에 있는 모든 SQL 데이터베이스 키는 ``:duct.database/sql``\를
+상속 받습니다. Duct는 이 키를 이용해서 첫번째로 사용 가능한 SQL 데이터베이스를 찾습니다.
 
 You may wonder why the ``duct.handler.sql`` keys didn't include a
 database key. This is because they all inherit from the
@@ -698,10 +673,9 @@ database key. This is because they all inherit from the
 ``:duct.module/sql`` module to automatically insert the reference. We
 could also do this, but for now we'll keep the reference explicit.
 
-It's now finally time to write the handler. The namespace of the
-keyword is ``todo.handler.users``, so we'll use that as the namespace
-for the code. Create a new file ``src/todo/handler/users.clj`` and add
-a namespace declaration:
+이제 핸들러 코드를 만들어 봅시다. 키워드에 사용한 네임스페이스는 ``todo.handler.users`` 입니다.
+그래서 코드에 네임스페이스도 같은 것을 사용하려고 합니다. ``src/todo/handler/users.clj`` 파일을
+만들고 네임스페이스를 선언합니다:
 
 .. code-block:: clojure
 
@@ -712,14 +686,11 @@ a namespace declaration:
               duct.database.sql
               [integrant.core :as ig]))
 
-Naturally we need ``buddy.hashers`` for our KDF, and we need
-``clojure.java.jdbc`` because we're accessing the database. The
-``integrant.core`` namespace is necessary because we're writing an
-Integrant multimethod, but the purpose of ``ataraxy.response`` and
-``duct.database.sql`` might be less obvious.
+KDF를 쓰기 위해 ``buddy.hashers``\가 필요하고 데이터베이스에 접근하기 위해 ``clojure.java.jdbc``\가
+필요합니다. ``integrant.core`` 네임스페이스는 Integrant 멀티메서드를 만들기 위해 필요하지만
+``ataraxy.response``\와 ``duct.database.sql``\는 추가하는 목적이 약간 명확하지 않습니다.
 
-Let's create the function to insert the new user into the database,
-and return the ID of the newly created row:
+이제 새 사용자를 데이터베이스에 추가하는 함수를 만들고 추가된 row 아이디를 리턴하도록 함수를 만들어봅시다:
 
 .. code-block:: clojure
 
@@ -733,19 +704,15 @@ and return the ID of the newly created row:
             results (jdbc/insert! db :users {:email email, :password pw-hash})]
         (-> results ffirst val))))
 
-If you're new to Duct, you might be surprised that we're using a
-protocol here. Why not just write a function? Why are we writing a
-protocol, then implementing it against this mysterious
-``duct.database.sql.Boundary`` type?
+Duct를 처음 사용한다면 여기에 프로토콜을 쓴다는 점이 생소할 것입니다. 왜 함수를 바로 쓰지 않죠?
+왜 이상한 ``duct.database.sql.Boundary`` 타입에 프로토콜을 구현을 하는거죠?
 
-The answer is that we *could* use a function, and it would certainly
-save us a few lines, but by using a protocol we gain the capability to
-mock out the database for testing or development. Duct provides an
-empty 'boundary' record, ``duct.database.sql.Boundary``, for this
-purpose. This is why we need to require the ``duct.database.sql``
-namespace, or the record will not be loaded.
+답은 분명히 함수를 *사용할 수* 있고 그러면 코드를 몇 줄 더 줄일 수 있습니다. 하지만 프로토콜을 사용하면
+개발이나 테스트 환경에 데이터베이스를 Mock으로 대체할 수 있다는 장점이 있습니다. 이런 이유로 Duct는
+``duct.database.sql.Boundary`` 라고 부르는 빈 '바운더리' 레코드를 제공합니다. 이것이 앞에서
+``duct.database.sql`` 네임스페이스를 포함시킨 이유입니다. 그렇지 않으면 레코드가 로드되지 않습니다.
 
-Finally, we write the ``init-key`` method for our keyword:
+마지막으로 create 키워드를 위한 ``init-key`` 메서드를 만듭니다:
 
 .. code-block:: clojure
 
@@ -754,11 +721,10 @@ Finally, we write the ``init-key`` method for our keyword:
       (let [id (create-user db email password)]
         [::response/created (str "/users/" id)])))
 
-Ataraxy allows a vector to be returned instead of the usual Ring
-response map. This is both a convenience, and an abstraction. Ataraxy
-will turn this into a ``201 Created`` response map for you.
+Ataraxy는 Ring 응답 맵 대신 백터를 리런 할 수 있습니다. 이 기능은 추상화와 편리함을 줍니다.
+Ataraxy는 ``201 Created`` 응답을 내려주게 됩니다.
 
-Let's ``reset``:
+이제 ``reset``\을 해봅시다:
 
 .. code-block:: clojure
 
@@ -766,7 +732,7 @@ Let's ``reset``:
   :reloading (todo.main todo.handler.users dev user)
   :resumed
 
-Then test it out::
+그리고 확인해봅니다::
 
   $ http post :3000/users email=bob@example.com password=hunter2
   HTTP/1.1 201 Created
@@ -776,44 +742,41 @@ Then test it out::
   Location: http://localhost:3000/users/1
   Server: Jetty(9.2.21.v20170120)
 
-We don't have any way of visualizing this information yet, so we need
-to take a look at the database.
+아직 어떤 시작적 정보도 없습니다. 이제 데이터베이스를 살펴볼 필요가 있습니다.
 
 .. _key derivation function: https://en.wikipedia.org/wiki/Key_derivation_function
 
 
-Querying the Database
+데이터베이스에 쿼리하기
 """""""""""""""""""""
 
-During development we likely want to query the database to ensure that
-the code we write is inserting the correct data. To make this process
-easier, we'll be adding to the ``dev`` namespace in
-``dev/src/dev.clj``.
 
-First, we want to require the ``clojure.java.jdbc`` namespace:
+개발을 하는 동안 우리가 작성한 코드가 데이터베이스에 데이터를 잘 넣고 있는지 확인할 필요가 있습니다.
+이 일을 쉽게 하기 위해 ``dev/src/dev.clj`` 파일에 ``dev`` 네임스페이스를 추가합시다.
+
+먼저 ``clojure.java.jdbc`` 네임스페이스가 필요합니다:
 
 .. code-block:: clojure
 
   [clojure.java.jdbc :as jdbc]
 
-Next we want a way of getting a database connection. Duct stores the
-running system in the ``system`` var during development. This allows
-us to write a simple function to retrieve a JDBC database spec:
+다음으로 데이터베이스 연결을 얻을 수 있어야 합니다. Duct는 개발하는 동안 ``system`` var에 동작하고
+있는 시스템 정보를 저장합니다. 그래서 JDBC 데이터베이스 스펙을 가져오는 간단한 함수를 아래와 같이 만들 수
+있습니다:
 
 .. code-block:: clojure
 
   (defn db []
     (-> system (ig/find-derived-1 :duct.database/sql) val :spec))
 
-Now that we can get the database, we can add a small function to help
-us query it:
+데이터베이스을 얻었으니 이제 쿼리를 도와주는 간단한 함수를 만들어 봅시다:
 
 .. code-block:: clojure
 
   (defn q [sql]
     (jdbc/query (db) sql))
 
-Once these changes are made, we ``reset``:
+다 했으면 ``reset``\을 실행해 줍니다:
 
 .. code-block:: clojure
 
@@ -821,7 +784,7 @@ Once these changes are made, we ``reset``:
   :reloading (dev)
   :resumed
 
-Then try querying our ``users`` table:
+다음에 ``users`` 테이블에 쿼리를 실행해 봅시다:
 
 .. code-block:: clojure
 
@@ -831,4 +794,4 @@ Then try querying our ``users`` table:
     :password
     "bcrypt+sha512$f4c1bc592ecd1869d0bf802f7c8f6e36$12$19a9ae3ed9118cb6cbfcd8c4a31aadb6b00162288b1fce50"})
 
-That certainly looks correct. We have an ID, email and an hashed password.
+잘 된 것 같습니다. ID, 이메일, 해쉬된 비밀번호가 있네요.
