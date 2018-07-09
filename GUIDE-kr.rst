@@ -555,17 +555,17 @@ DELETE도 만들어봅시다.
 코드
 ~~~~
 
-지금까지 Duct 애플리케이션을 만들기 만들기 위해 설정을 사용하는 방법에 대해 알아봤습니다.
-단순한 기능에는 이 방법으로 잘 동작하지만 대부분의 애플리케이션은 코드를 작성해야 합니다.
+지금까지 설정을 사용해서 Duct 애플리케이션을 만들어 봤습니다. 단순한 기능을 만들 때는 설정만으로 만들 수
+있지만 대부분의 애플리케이션은 코드를 작성해야 합니다.
 
-데이터를 기반으로 핸들러를 정의하는 것은 장점이 있지만 너무 과하지 않도록 하는 것이 중요합니다.
-애플리케이션에서 설정은 골격으로 코드는 근육과 기관으로 생각하세요.
+설정을 사용한 데이터 기반으 핸들러는 장점이 있지만 너무 과하지 않도록 하는 것이 중요합니다.
+애플리케이션을 만들 때 설정은 골격으로 코드는 근육과 기관으로 생각하면 좋습니다.
 
 사용자 추가하기
 """"""""""""
 
-지금까지 사용자가 한명인 애플리케이션을 만들었습니다. 이제 ``users`` 테이블을 추가해서 바꿔 봅시다.
-먼저 설정에 새 마이그레이션 참조를 추가합니다:
+지금까지 사용자가 한명인 애플리케이션을 만들었습니다. 이제 ``users`` 테이블을 추가해서 사용자가 여러명인
+애플리케이션으로 바꿔 봅시다. 먼저 설정에 새 마이그레이션 참조를 추가합니다:
 
 .. code-block:: edn
 
@@ -573,7 +573,7 @@ DELETE도 만들어봅시다.
   {:migrations [#ig/ref :todo.migration/create-entries
                 #ig/ref :todo.migration/create-users]}
 
-다음에 마이그레이션을 만듭니다:
+그리고 마이그레이션을 만듭니다:
 
 .. code-block:: edn
 
@@ -581,7 +581,7 @@ DELETE도 만들어봅시다.
   {:up ["CREATE TABLE users (id INTEGER PRIMARY KEY, email TEXT UNIQUE, password TEXT)"]
    :down ["DROP TABLE users"]}
 
-다음은 새 마이그레이션을 적용하기 위해 ``reset``\을 실행합니다:
+새 마이그레이션을 적용하기 위해 ``reset``\을 실행합니다:
 
 .. code-block:: clojure
 
@@ -590,18 +590,18 @@ DELETE도 만들어봅시다.
   :duct.migrator.ragtime/applying :todo.migration/create-users#66d6b1f8
   :resumed
 
-이제 사용자를 저장할 테이블이 생겼으니 다음으로 사용자들이 웹 서비스에서 가입할 수 방법이 필요합니다.
-``duct/handler.sql`` 라이브러리로 핸들러를 만들 수 있지만 데이터베이스에 직접 비밀번호를 저장하는
-것은 보안에 좋지 않습니다.
+사용자를 저장할 테이블이 생겼으니 이제 사용자들이 웹 서비스에서 가입할 수 방법이 필요합니다.
+``duct/handler.sql`` 라이브러리로 핸들러를 만들 수 있지만 그렇게 하면 비밀번호를 데이터베이스에
+그대로 저장하게 되어 보안에 좋지 않습니다.
 
-대신 비밀번호 보안 방식 중 하나인 `key derivation function`_\(또는 KDF)를 이용해서 핸들러 함수를
-직접 만들어 봅시다. 먼저 아래와 같이 새로운 라이브러리를 프로젝트 디펜던시에 추가합니다:
+대신 비밀번호 보안 방식 중 하나인 `key derivation function`_\(또는 KDF)를 이용해서 암호화된
+비밀번호를 저장하도록 핸들러 함수를 직접 만들어 봅시다. 먼저 아래 라이브러리를 프로젝트 디펜던시에 추가합니다:
 
 .. code-block:: clojure
 
   [buddy/buddy-hashers "1.3.0"]
 
-이 라이브러리를 추가하면 KDF를 사용할 수 있습니다. 디펜던시를 추가한 후에 REPL을 종료합니다:
+이 라이브러리를 추가하면 키 유도 함수(KDF)를 사용할 수 있습니다. 디펜던시를 추가한 후에 REPL을 종료합니다:
 
 .. code-block:: clojure
 
@@ -612,7 +612,7 @@ DELETE도 만들어봅시다.
 
   $ lein repl
 
-다음은 애플리케이션을 시작합니다:
+다음은 애플리케이션을 시작해줍니다:
 
 .. code-block:: clojure
   user=> (dev)
@@ -621,7 +621,7 @@ DELETE도 만들어봅시다.
   :duct.server.http.jetty/starting-server {:port 3000}
   :initiated
 
-다음으로 사용자를 생성하기 위한 Ataraxy 라우터를 추가합니다:
+이제 사용자를 생성하기 위한 Ataraxy 라우터를 추가합니다:
 
 .. code-block:: edn
 
@@ -645,21 +645,19 @@ DELETE도 만들어봅시다.
   :todo.handler.users/create
   {:db #ig/ref :duct.database/sql}
 
-방금 추가한 설정에는 컴포지트 키를 사용하지 않았습니다. 왜냐하면 기존에 있는 기능이 아니고 새로운 기능을
-만들기 때문입니다.
+방금 추가한 핸들러 설정은 복합 키(Composite Key)를 사용하지 않았습니다. 왜냐하면 기존에 있는 기능을
+상속하지 않고 새로운 기능을 만들려고 하기 때문입니다.
 
 그리고 데이터베이스 참조를 추가했습니다. Duct에 있는 모든 SQL 데이터베이스 키는 ``:duct.database/sql``\를
-상속 받습니다. Duct는 이 키를 이용해서 첫번째로 사용 가능한 SQL 데이터베이스를 찾습니다.
+상속 받습니다. Duct는 이 키를 이용해서 사용 가능한 SQL 데이터베이스를 찾습니다.
 
-You may wonder why the ``duct.handler.sql`` keys didn't include a
-database key. This is because they all inherit from the
-``:duct.module.sql/requires-db`` keyword, which is a indicator to the
-``:duct.module/sql`` module to automatically insert the reference. We
-could also do this, but for now we'll keep the reference explicit.
+``duct.handler.sql`` 키를 사용하면 ``:duct.module/sql`` 모듈을 추가해주는
+``:duct.module.sql/requires-db`` 키워드를 상속하고 있기 때문 자동으로 데이터베이스 참조가 추가됩니다.
+하지만 여기서는 ``duct.handler.sql`` 키를 사용하지 않고 명시적으로 데이터베이스 참조를 추가했습니다.
 
 이제 핸들러 코드를 만들어 봅시다. 키워드에 사용한 네임스페이스는 ``todo.handler.users`` 입니다.
-그래서 코드에 네임스페이스도 같은 것을 사용하려고 합니다. ``src/todo/handler/users.clj`` 파일을
-만들고 네임스페이스를 선언합니다:
+그래서 코드에 있는 네임스페이스도 같은 것을 사용하려고 합니다. ``src/todo/handler/users.clj``
+파일을 만들고 네임스페이스를 선언합니다:
 
 .. code-block:: clojure
 
@@ -670,11 +668,12 @@ could also do this, but for now we'll keep the reference explicit.
               duct.database.sql
               [integrant.core :as ig]))
 
-KDF를 쓰기 위해 ``buddy.hashers``\가 필요하고 데이터베이스에 접근하기 위해 ``clojure.java.jdbc``\가
-필요합니다. ``integrant.core`` 네임스페이스는 Integrant 멀티메서드를 만들기 위해 필요하지만
-``ataraxy.response``\와 ``duct.database.sql``\는 추가하는 목적이 약간 명확하지 않습니다.
+키 유도 함수(KDF)를 쓰기 위해 ``buddy.hashers``\가 필요하고 데이터베이스에 접근하기 위해
+``clojure.java.jdbc``\가 필요합니다. ``integrant.core`` 네임스페이스는 Integrant 멀티메서드를
+만들기 위해 필요하지만 ``ataraxy.response``\와 ``duct.database.sql``\는 추가하는 목적이
+아직 명확하지 않습니다. (뒤에서 알아 봅니다.)
 
-이제 새 사용자를 데이터베이스에 추가하는 함수를 만들고 추가된 row 아이디를 리턴하도록 함수를 만들어봅시다:
+이제 새 사용자를 데이터베이스에 추가하는 함수를 만들고 추가된 row 아이디를 리턴하는 함수를 만들어봅시다:
 
 .. code-block:: clojure
 
@@ -688,12 +687,12 @@ KDF를 쓰기 위해 ``buddy.hashers``\가 필요하고 데이터베이스에 �
             results (jdbc/insert! db :users {:email email, :password pw-hash})]
         (-> results ffirst val))))
 
-Duct를 처음 사용한다면 여기에 프로토콜을 쓴다는 점이 생소할 것입니다. 왜 함수를 바로 쓰지 않죠?
-왜 이상한 ``duct.database.sql.Boundary`` 타입에 프로토콜을 구현을 하는거죠?
+Duct를 처음 사용한다면 여기서 프로토콜을 쓴다는 점이 생소할 것입니다. 왜 함수를 바로 쓰지 않을까요?
+왜 이상한 ``duct.database.sql.Boundary`` 타입에 프로토콜을 구현을 하는걸까요?
 
-답은 분명히 함수를 *사용할 수* 있고 그러면 코드를 몇 줄 더 줄일 수 있습니다. 하지만 프로토콜을 사용하면
-개발이나 테스트 환경에 데이터베이스를 Mock으로 대체할 수 있다는 장점이 있습니다. 이런 이유로 Duct는
-``duct.database.sql.Boundary`` 라고 부르는 빈 '바운더리' 레코드를 제공합니다. 이것이 앞에서
+분명한 점은 함수로 *만들어도* 되고 그렇게하면 코드를 몇 줄 더 줄일 수 있습니다. 하지만 프로토콜을 사용하면
+개발 환경이나 테스트 환경에서 데이터베이스를 Mock으로 대체할 수 있다는 장점이 있습니다. 이런 이유로 Duct는
+``duct.database.sql.Boundary``\라고 부르는 비어 있는 '바운더리' 레코드를 제공합니다. 앞에서
 ``duct.database.sql`` 네임스페이스를 포함시킨 이유입니다. 그렇지 않으면 레코드가 로드되지 않습니다.
 
 마지막으로 create 키워드를 위한 ``init-key`` 메서드를 만듭니다:
@@ -706,7 +705,7 @@ Duct를 처음 사용한다면 여기에 프로토콜을 쓴다는 점이 생소
         [::response/created (str "/users/" id)])))
 
 Ataraxy는 Ring 응답 맵 대신 백터를 리런 할 수 있습니다. 이 기능은 추상화와 편리함을 줍니다.
-Ataraxy는 ``201 Created`` 응답을 내려주게 됩니다.
+위 예제에서 Ataraxy는 ``201 Created`` 응답을 내려주게 됩니다.
 
 이제 ``reset``\을 해봅시다:
 
@@ -726,7 +725,7 @@ Ataraxy는 ``201 Created`` 응답을 내려주게 됩니다.
   Location: http://localhost:3000/users/1
   Server: Jetty(9.2.21.v20170120)
 
-아직 어떤 시작적 정보도 없습니다. 이제 데이터베이스를 살펴볼 필요가 있습니다.
+아직 잘 되었는지 눈으로 확인해 볼 방법은 없습니다. 그래서 이제 데이터베이스를 살펴볼 필요가 있습니다.
 
 .. _key derivation function: https://en.wikipedia.org/wiki/Key_derivation_function
 
@@ -735,8 +734,8 @@ Ataraxy는 ``201 Created`` 응답을 내려주게 됩니다.
 """""""""""""""""""""
 
 
-개발을 하는 동안 우리가 작성한 코드가 데이터베이스에 데이터를 잘 넣고 있는지 확인할 필요가 있습니다.
-이 일을 쉽게 하기 위해 ``dev/src/dev.clj`` 파일에 ``dev`` 네임스페이스를 추가합시다.
+개발을 하면서 데이터베이스에 데이터가 잘 들어가고 있는지 확인할 필요가 있습니다.
+개발의 편의를 위해 ``dev/src/dev.clj`` 파일에 ``dev`` 네임스페이스를 추가합시다.
 
 먼저 ``clojure.java.jdbc`` 네임스페이스가 필요합니다:
 
@@ -744,16 +743,16 @@ Ataraxy는 ``201 Created`` 응답을 내려주게 됩니다.
 
   [clojure.java.jdbc :as jdbc]
 
-다음으로 데이터베이스 연결을 얻을 수 있어야 합니다. Duct는 개발하는 동안 ``system`` var에 동작하고
-있는 시스템 정보를 저장합니다. 그래서 JDBC 데이터베이스 스펙을 가져오는 간단한 함수를 아래와 같이 만들 수
-있습니다:
+다음으로 데이터베이스 연결이 필요합니다. 개발 환경에서 Duct는 ``system`` var에 현재 동작하는
+시스템 정보를 저장하고 있습니다. 그래서 JDBC 데이터베이스 스펙을 가져오는 간단한 함수를 아래와 같이
+만들 수 있습니다:
 
 .. code-block:: clojure
 
   (defn db []
     (-> system (ig/find-derived-1 :duct.database/sql) val :spec))
 
-데이터베이스을 얻었으니 이제 쿼리를 도와주는 간단한 함수를 만들어 봅시다:
+데이터베이스 연결을 가져왔으니 이제 쿼리를 도와주는 간단한 함수를 만들어 봅시다:
 
 .. code-block:: clojure
 
@@ -768,7 +767,7 @@ Ataraxy는 ``201 Created`` 응답을 내려주게 됩니다.
   :reloading (dev)
   :resumed
 
-다음에 ``users`` 테이블에 쿼리를 실행해 봅시다:
+다음에 ``users`` 테이블에 쿼리를 실행해 봅니다:
 
 .. code-block:: clojure
 
