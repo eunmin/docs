@@ -5,9 +5,9 @@ Duct Framework 가이드
 ~~~~~~~
 
 Duct는 Clojure_ 프로그래밍 언어로 서버 애플리케이션을 만들기 위한 data-driven 프레임워크입니다.
-이 가이드는 웹 애플리케이션 중점을 두고 Duct 사용법을 자세히 설명하기 위해 섰습니다.
+이 가이드는 웹 애플리케이션을 예제로 Duct 사용법을 자세히 설명하기 위해 섰습니다.
 
-또 이 가이드는 Leiningen_\이 설치되어 있고 Clojure 실무 지식이 있다는 가정을 하고 썼습니다.
+이 가이드를 제대로 읽으려면 Leiningen_\이 설치되어 있고 Clojure 실무 지식이 있어야합니다.
 꼭 필요한 것은 아니지만 Ring_\의 기초적인 부분을 알고 있으면 좋습니다.
 
 .. _Clojure:   https://clojure.org/
@@ -33,8 +33,8 @@ Duct Leiningen 템플릿으로 바로 시작해 볼 수 있습니다. Duct로 �
   Generating a new Duct project named todo...
   Run 'lein duct setup' in the project directory to create local config files.
 
-``+``\로 시작하는 파라미터는 프로필 힌트로 웹 서비스 (``+api``)와 Ataraxy_ 라우팅 라이브러리
-(``+ataraxy``), SQLite 데이터베이스 (``+sqlite``)를 사용하는 프로젝트를 만들어 줍니다.
+``+``\로 시작하는 파라미터는 프로필 힌트입니다. 위 예제는 웹 서비스 (``+api``)와 Ataraxy_ 라우팅 라이브러리
+(``+ataraxy``), SQLite 데이터베이스 (``+sqlite``)를 사용하는 프로젝트를 템플릿을 만드는 예제입니다.
 
 사용할 수 있는 프로필 힌트를 모두 보려면 아래 명령어를 실행합니다::
 
@@ -48,15 +48,15 @@ Duct Leiningen 템플릿으로 바로 시작해 볼 수 있습니다. Duct로 �
 
   $ lein duct setup
 
-그러면 소스 컨트롤에는 제외되어 있는 파일 4개가 생깁니다::
+셑업을 실행하고 나면 소스 컨트롤에는 제외되어 있는 파일 4개가 생깁니다::
 
   Created profiles.clj
   Created .dir-locals.el
   Created dev/resources/local.edn
   Created dev/src/local.clj
 
-Git_\을 사용하면 이 파일들은 ``.gitignore``\에 추가되어 있습니다. 하지만 다른 소스 컨트롤을 사용한다면
-소스 컨트롤에 관리되지 않도록 수동으로 처리해줘야 합니다.
+이 파일들은 ``.gitignore``\에 추가되어 있기 때문에 Git_\을 사용하면 따로 해줄 일이 없습니다. 하지만
+다른 소스 컨트롤을 사용한다면 이 파일들이 소스 컨트롤에 관리되지 않도록 수동으로 처리해줘야 합니다.
 
 .. _SQLite:  https://sqlite.org/
 .. _Ataraxy: https://github.com/weavejester/ataraxy
@@ -68,7 +68,7 @@ REPL 시작하기
 
 Duct는 REPL을 중심으로 개발 하도록 되어 있습니다. 그래서 Cursive_\나 Emacs_\의 CIDER_, Vim_\의
 `fireplace.vim`_, Atom_\의 `Proto REPL`_\같은 에디터 REPL 통합 환경을 사용하는 것을 추천합니다.
-하지만 이 가이드에서는 에디터 통합 없이 커맨드 라인에서 직접 실행해볼 수 있도록 되어 있습니다.
+하지만 이 가이드는 에디터 통합 없이 커맨드 라인에서 직접 실행해볼 수 있도록 되어 있습니다.
 
 REPL을 시작합니다::
 
@@ -82,9 +82,9 @@ REPL을 시작합니다::
   :loaded
   dev=>
 
-개발 환경에 에러가 있는 경우 REPL이 실행되지 않을 수 있기 때문에 개발 환경은 자동으로 로드하지 않습니다.
+개발 환경에 에러가 있는 경우 REPL이 실행되지 않을 수 있기 때문에 개발 환경은 자동으로 로드되지 않습니다.
 
-``dev`` 네임스페이스에 들어오면 애플리케이션을 실행해볼 수 있습니다:
+``dev`` 네임스페이스로 바뀌면 애플리케이션을 실행해볼 수 있습니다:
 
 .. code-block:: clojure
 
@@ -106,7 +106,7 @@ REPL을 시작합니다::
       "error": "not-found"
   }
 
-"not found" 응답을 받았습니다. 하지만 아직 라우터를 추가하지 않았기 때문에 예상된 결과입니다.
+"not found" 응답을 받았습니다. 아직 아무 라우터도 추가하지 않았기 때문에 예상된 결과입니다.
 
 .. _Cursive:       https://cursive-ide.com/
 .. _Emacs:         https://www.gnu.org/software/emacs/
