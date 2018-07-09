@@ -123,8 +123,8 @@ REPL을 시작합니다::
 Configuration
 ~~~~~~~~~~~~~
 
-Duct 어플리케이션은 edn_ 컨피그 파일 주위에 빌드됩니다.
-이것은 어플리케이션의 구조와 디펜던시를 정의합니다.
+Duct 어플리케이션은 edn_ 컨피그 파일 주위에서 빌드됩니다.
+Configuration 파일은 어플리케이션의 구조와 디펜던시를 정의합니다.
 이 가이드안에서 만든 프로젝트에서, 컨피그레이션 파일은 다음 위치에 있습니다:
 ``resources/todo/config.edn``.
 
@@ -145,15 +145,15 @@ Config 파일을 살펴보겠습니다:
    :duct.module/ataraxy
    {}}
 
-정적 인덱스 라우트를 추가하는 것으로 시작할 수 있습니다.
-Ataraxy가 라우터이기 때문에 ``:duct.module/ataraxy`` 를 한줄 추가합니다:
+정적 index 라우트를 추가하는 것으로 시작할 수 있을텐데,
+Ataraxy가 사용할 라우터이기 때문에 ``:duct.module/ataraxy`` 라고 한 줄을 추가합니다:
 
 .. code-block:: edn
 
   :duct.module/ataraxy
   {[:get "/"] [:index]}
 
-  이것은 ``[:get "/"]`` 경로를 ``[:index]`` 로 연결합니다.
+  이것은 라우트 ``[:get "/"]`` 를 ``[:index]`` 로 연결합니다.
   Ataraxy 모듈은 자동으로 컨피그에서 이름과 일치하는 Ring 핸들러를 찾아 쌍을 이룹니다.
   결과 키가 ``:index`` 이기 때문에, 핸들러 키는 ``:todo.handler/index`` 가 됩니다.
   컨피그에 그 이름을 가진 엔트리를 추가해봅시다:
@@ -177,8 +177,8 @@ Ataraxy가 라우터이기 때문에 ``:duct.module/ataraxy`` 를 한줄 추가�
   :reloading (todo.main dev user)
   :resumed
 
-이것은 컨피그 와 변경된 파일을 재로드합니다.
-이제는 웹 서버에 요청을 보내, 예상된 응답을 받습니다::
+이것은 컨피그와 변경된 파일을 다시 로드합니다.
+이제는 웹 서버에 요청을 보내, 예상된 응답을 받을 수 있습니다::
 
   $ http :3000
   HTTP/1.1 200 OK
@@ -247,7 +247,7 @@ up은 마이그레이션을, down은 롤백을 하게 됩니다.
   :duct.migrator.ragtime/applying :todo.migration/create-entries#5c2bb12a
   :resumed
 
-이전 버전의 이전은 자동으로 롤백되고 새 버전의 마이그레이션이 대신 적용됩니다.
+이전 버전의 마이그레이션은 자동으로 롤백되고 새 버전의 마이그레이션이 대신 적용됩니다.
 
 .. _Ragtime: https://github.com/weavejester/ragtime
 
@@ -287,8 +287,8 @@ up은 마이그레이션을, down은 롤백을 하게 됩니다.
                  [duct/module.sql "0.4.2"]
                  [org.xerial/sqlite-jdbc "3.20.1"]]
 
-REPL을 다시 시작해야하는 하는 몇가지 이유중 하나는,
-디펜던시를 추가해야할 때이므로 일단 REPL에서 빠져나옵니다.
+디펜던시를 추가했을 때에는 REPL을 다시 시작해야하므로,
+일단 REPL에서 빠져나옵니다.
 
 .. code-block:: clojure
 
@@ -308,7 +308,7 @@ REPL을 다시 시작해야하는 하는 몇가지 이유중 하나는,
   :duct.server.http.jetty/starting-server {:port 3000}
   :initiated
 
-이제 프로젝트 컨피그레이션으로 돌아갈 수 있습니다.
+이제 프로젝트 컨피그로 돌아가서,
 새로운 Ataraxy 라우트를 추가하는 것으로 시작해봅시다:
 
 .. code-block:: edn
@@ -319,7 +319,7 @@ REPL을 다시 시작해야하는 하는 몇가지 이유중 하나는,
 
 앞서 본 것과 같이, ``[:entries/list]`` 는 적절하게 이름 붙여진 Ring 핸들러와 쌍을 이뤄야합니다.
 Ataraxy 모듈은 이 핸들러 이름이  ``:todo.handler.entries/list`` 이기를 기대하기 때문에,
-``:duct.handler.sql/query`` 키와 함께 그 이름을 사용할 것입니다:
+``:duct.handler.sql/query`` 키와 함께 그 이름을 사용하게 됩니다:
 
 .. code-block:: edn
 
@@ -346,7 +346,7 @@ Ataraxy 모듈은 이 핸들러 이름이  ``:todo.handler.entries/list`` 이기
   []
 
 유효한 응답이지만, 비어있는 응답입니다.
-``entries`` 테이블에 아무런 데이터도 넣지 않았기 때문인 것을 알수 있습니다.
+``entries`` 테이블에 아무 데이터도 넣지 않았기 때문인 것을 알수 있습니다.
 
 
 업데이트 라우트 추가하기
@@ -474,7 +474,7 @@ DELETE도 만들어봅시다.
 이 라우트는 URI에서 데이터를 가져와서, 새로운 타입으로 강제하는 방법을 보여줍니다.
 
 라우트에는 관련된 핸들러가 필요합니다. 앞서 나온 `duct/handler.sql` 라이브러리의
-`query-one` 와 `execute` 핸들러 타입을사용해봅니다:
+`query-one` 와 `execute` 핸들러 타입을 사용해봅니다:
 
 .. code-block:: edn
 
