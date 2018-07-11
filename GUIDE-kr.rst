@@ -153,10 +153,10 @@ Ataraxy가 사용할 라우터이기 때문에 ``:duct.module/ataraxy`` 라고 �
   :duct.module/ataraxy
   {[:get "/"] [:index]}
 
-  이것은 라우트 ``[:get "/"]`` 를 ``[:index]`` 로 연결합니다.
-  Ataraxy 모듈은 자동으로 컨피그에서 이름과 일치하는 Ring 핸들러를 찾아 쌍을 이룹니다.
-  결과 키가 ``:index`` 이기 때문에, 핸들러 키는 ``:todo.handler/index`` 가 됩니다.
-  컨피그에 그 이름을 가진 엔트리를 추가해봅시다:
+이것은 라우트 ``[:get "/"]`` 를 ``[:index]`` 로 연결합니다.
+Ataraxy 모듈은 자동으로 컨피그에서 이름과 일치하는 Ring 핸들러를 찾아 쌍을 이룹니다.
+결과 키가 ``:index`` 이기 때문에, 핸들러 키는 ``:todo.handler/index`` 가 됩니다.
+컨피그에 그 이름을 가진 엔트리를 추가해봅시다:
 
 .. code-block:: edn
 
@@ -268,7 +268,7 @@ up은 마이그레이션을, down은 롤백을 하게 됩니다.
 
 이제 데이터베이스 테이블이 생겼으므로 쿼리 라우트를 작성해야합니다.
 ``duct/handler.sql`` 라고 불리는 라이브러리를 사용할 것입니다.
-이것은 ``project.clj`` 파일의 ``:dependencies`` 키에 추가돼야 합니다::
+이것은 ``project.clj`` 파일의 ``:dependencies`` 키에 추가돼야 합니다:
 
 .. code-block:: clojure
 
@@ -299,9 +299,10 @@ up은 마이그레이션을, down은 롤백을 하게 됩니다.
 
   $ lein repl
 
-그리고 어플리케이션을 다시 실행합니다::
+그리고 어플리케이션을 다시 실행합니다:
 
 .. code-block:: clojure
+
   user=> (dev)
   :loaded
   dev=> (go)
@@ -429,9 +430,9 @@ DELETE도 만들어봅시다.
   {:sql   ["SELECT * FROM entries"]
    :hrefs {:href "/entries/{id}"}}
 
-``:hrefs`` 옵션은 `URI templates`_을 사용해
+``:hrefs`` 옵션은 `URI templates`_ 을 사용해
 응답에 하이퍼텍스트 참조를 추가할 수 있게합니다.
- ``reset`` 을 하면:
+``reset`` 을 하면:
 
 .. code-block:: clojure
 
@@ -558,7 +559,7 @@ DELETE도 만들어봅시다.
 지금까지 설정을 사용해서 Duct 애플리케이션을 만들어 봤습니다. 단순한 기능을 만들 때는 설정만으로 만들 수
 있지만 대부분의 애플리케이션은 코드를 작성해야 합니다.
 
-설정을 사용한 데이터 기반으 핸들러는 장점이 있지만 너무 과하지 않도록 하는 것이 중요합니다.
+설정을 사용한 데이터 기반의 핸들러는 장점이 있지만 너무 과하지 않도록 하는 것이 중요합니다.
 애플리케이션을 만들 때 설정은 골격으로 코드는 근육과 기관으로 생각하면 좋습니다.
 
 사용자 추가하기
