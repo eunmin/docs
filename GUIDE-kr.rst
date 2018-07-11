@@ -649,9 +649,9 @@ DELETE도 만들어봅시다.
 그리고 데이터베이스 참조를 추가했습니다. Duct에 있는 모든 SQL 데이터베이스 키는 ``:duct.database/sql``\를
 상속 받습니다. Duct는 이 키를 이용해서 사용 가능한 SQL 데이터베이스를 찾습니다.
 
-``duct.handler.sql`` 키를 사용하면 ``:duct.module/sql`` 모듈을 추가해주는
-``:duct.module.sql/requires-db`` 키워드를 상속하고 있기 때문 자동으로 데이터베이스 참조가 추가됩니다.
-하지만 여기서는 ``duct.handler.sql`` 키를 사용하지 않고 명시적으로 데이터베이스 참조를 추가했습니다.
+``duct.handler.sql`` 키는 ``:duct.module.sql/requires-db`` 키워드를 상속하고 있기 때문에
+``:duct.module/sql`` 모듈이 자동으로 데이터베이스 참조를 추가해줍니다. 하지만 여기서는
+``duct.handler.sql`` 키를 사용하지 않고 명시적으로 데이터베이스 참조를 추가했습니다.
 
 이제 핸들러 코드를 만들어 봅시다. 키워드에 사용한 네임스페이스는 ``todo.handler.users`` 입니다.
 그래서 코드에 있는 네임스페이스도 같은 것을 사용하려고 합니다. ``src/todo/handler/users.clj``
