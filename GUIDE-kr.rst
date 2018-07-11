@@ -44,11 +44,11 @@ Duct Leiningen 템플릿으로 바로 시작해 볼 수 있습니다. Duct로 �
 
   $ cd todo
 
-그리고 로컬 셑업을 실행합니다::
+그리고 로컬 업을 실행합니다::
 
   $ lein duct setup
 
-셑업을 실행하고 나면 소스 컨트롤에는 제외되어 있는 파일 4개가 생깁니다::
+셋업을 실행하고 나면 소스 컨트롤에는 제외되어 있는 파일 4개가 생깁니다::
 
   Created profiles.clj
   Created .dir-locals.el
@@ -123,9 +123,9 @@ REPL을 시작합니다::
 Configuration
 ~~~~~~~~~~~~~
 
-Duct 어플리케이션은 edn_ 컨피그 파일 주위에서 빌드됩니다.
+Duct 어플리케이션은 edn_ 설정 파일 주위에서 빌드됩니다.
 Configuration 파일은 어플리케이션의 구조와 디펜던시를 정의합니다.
-이 가이드안에서 만든 프로젝트에서, 컨피그레이션 파일은 다음 위치에 있습니다:
+이 가이드안에서 만든 프로젝트에서, 설정 파일은 다음 위치에 있습니다:
 ``resources/todo/config.edn``.
 
 정적 라우트 추가하기
@@ -153,10 +153,10 @@ Ataraxy가 사용할 라우터이기 때문에 ``:duct.module/ataraxy`` 라고 �
   :duct.module/ataraxy
   {[:get "/"] [:index]}
 
-  이것은 라우트 ``[:get "/"]`` 를 ``[:index]`` 로 연결합니다.
-  Ataraxy 모듈은 자동으로 컨피그에서 이름과 일치하는 Ring 핸들러를 찾아 쌍을 이룹니다.
-  결과 키가 ``:index`` 이기 때문에, 핸들러 키는 ``:todo.handler/index`` 가 됩니다.
-  컨피그에 그 이름을 가진 엔트리를 추가해봅시다:
+이것은 라우트 ``[:get "/"]`` 를 ``[:index]`` 로 연결합니다.
+Ataraxy 모듈은 자동으로 설정에서 이름과 일치하는 Ring 핸들러를 찾아 쌍을 이룹니다.
+결과 키가 ``:index`` 이기 때문에, 핸들러 키는 ``:todo.handler/index`` 가 됩니다.
+설정에 그 이름을 가진 엔트리를 추가해봅시다:
 
 .. code-block:: edn
 
@@ -166,7 +166,7 @@ Ataraxy가 사용할 라우터이기 때문에 ``:duct.module/ataraxy`` 라고 �
 이번에는 벡터를 키로 사용합니다; Duct에서는 이것을 *복합 (composite key)* 라고 합니다.
 복합 키는 복합 키에 속한 모든 키워드의 속성을 상속 받습니다;
 벡터에 ``:duct.handler.static/ok`` 가 포함되어 있기 때문에,
-컨피그레이션 엔트리가 정적 핸들러를 생성합니다.
+설정 엔트리가 정적 핸들러를 생성합니다.
 
 이 변경사항을 어플리케이션에 적용해 보겠습니다.
 레플로 돌아가서 실행해보세요:
@@ -177,7 +177,7 @@ Ataraxy가 사용할 라우터이기 때문에 ``:duct.module/ataraxy`` 라고 �
   :reloading (todo.main dev user)
   :resumed
 
-이것은 컨피그와 변경된 파일을 다시 로드합니다.
+이것은 설정과 변경된 파일을 다시 로드합니다.
 이제는 웹 서버에 요청을 보내, 예상된 응답을 받을 수 있습니다::
 
   $ http :3000
@@ -198,9 +198,9 @@ Ataraxy가 사용할 라우터이기 때문에 ``:duct.module/ataraxy`` 라고 �
 
 더 많은 동적 라우트를 추가하고 싶지만, 그전에 데이터베이스 스키마를 생성해야합니다.
 Duct는 Ragtime_ 을 사용해 마이그레이션을 하고,
-각 마이그레이션은 컨피그에서 정의됩니다.
+각 마이그레이션은 설정에서 정의됩니다.
 
-컨피그에 두 개의 키를 더 추가합니다.
+설정에 두 개의 키를 더 추가합니다.
 
 .. code-block:: edn
 
@@ -268,7 +268,7 @@ up은 마이그레이션을, down은 롤백을 하게 됩니다.
 
 이제 데이터베이스 테이블이 생겼으므로 쿼리 라우트를 작성해야합니다.
 ``duct/handler.sql`` 라고 불리는 라이브러리를 사용할 것입니다.
-이것은 ``project.clj`` 파일의 ``:dependencies`` 키에 추가돼야 합니다::
+이것은 ``project.clj`` 파일의 ``:dependencies`` 키에 추가돼야 합니다:
 
 .. code-block:: clojure
 
@@ -299,16 +299,17 @@ up은 마이그레이션을, down은 롤백을 하게 됩니다.
 
   $ lein repl
 
-그리고 어플리케이션을 다시 실행합니다::
+그리고 어플리케이션을 다시 실행합니다:
 
 .. code-block:: clojure
+
   user=> (dev)
   :loaded
   dev=> (go)
   :duct.server.http.jetty/starting-server {:port 3000}
   :initiated
 
-이제 프로젝트 컨피그로 돌아가서,
+이제 프로젝트 설정으로 돌아가서,
 새로운 Ataraxy 라우트를 추가하는 것으로 시작해봅시다:
 
 .. code-block:: edn
@@ -326,7 +327,7 @@ Ataraxy 모듈은 이 핸들러 이름이  ``:todo.handler.entries/list`` 이기
   [:duct.handler.sql/query :todo.handler.entries/list]
   {:sql ["SELECT * FROM entries"]}
 
-일단 핸들러가 컨피그에서 정의되면, ``reset`` 을 할 수 있습니다 :
+일단 핸들러가 설정에서 정의되면, ``reset`` 을 할 수 있습니다 :
 
 .. code-block:: clojure
 
@@ -429,9 +430,9 @@ DELETE도 만들어봅시다.
   {:sql   ["SELECT * FROM entries"]
    :hrefs {:href "/entries/{id}"}}
 
-``:hrefs`` 옵션은 `URI templates`_을 사용해
+``:hrefs`` 옵션은 `URI templates`_ 을 사용해
 응답에 하이퍼텍스트 참조를 추가할 수 있게합니다.
- ``reset`` 을 하면:
+``reset`` 을 하면:
 
 .. code-block:: clojure
 
@@ -558,7 +559,7 @@ DELETE도 만들어봅시다.
 지금까지 설정을 사용해서 Duct 애플리케이션을 만들어 봤습니다. 단순한 기능을 만들 때는 설정만으로 만들 수
 있지만 대부분의 애플리케이션은 코드를 작성해야 합니다.
 
-설정을 사용한 데이터 기반으 핸들러는 장점이 있지만 너무 과하지 않도록 하는 것이 중요합니다.
+설정을 사용한 데이터 기반의 핸들러는 장점이 있지만 너무 과하지 않도록 하는 것이 중요합니다.
 애플리케이션을 만들 때 설정은 골격으로 코드는 근육과 기관으로 생각하면 좋습니다.
 
 사용자 추가하기
