@@ -44,11 +44,11 @@ Duct Leiningen 템플릿으로 바로 시작해 볼 수 있습니다. Duct로 �
 
   $ cd todo
 
-그리고 로컬 셑업을 실행합니다::
+그리고 로컬 업을 실행합니다::
 
   $ lein duct setup
 
-셑업을 실행하고 나면 소스 컨트롤에는 제외되어 있는 파일 4개가 생깁니다::
+셋업을 실행하고 나면 소스 컨트롤에는 제외되어 있는 파일 4개가 생깁니다::
 
   Created profiles.clj
   Created .dir-locals.el
