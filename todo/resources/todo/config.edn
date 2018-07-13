@@ -1,0 +1,55 @@
+{:duct.core/project-ns  todo
+ :duct.core/environment :production
+
+ :duct.module/logging {}
+ :duct.module.web/api {}
+ :duct.module/sql {}
+
+ :duct.module/ataraxy
+ {[:get "/"] [:index]
+  [:get "/entries"] [:entries/list]
+
+  [:post "/entries" {{:keys [description]} :body-params}]
+  [:entries/create description]
+
+  [:get    "/entries/" id] [:entries/find    ^int id]
+  [:delete "/entries/" id] [:entries/destroy ^int id]
+
+  [:post "/users" {{:keys [email password]} :body-params}]
+  [:users/create email password]}
+
+ [:duct.handler.static/ok :todo.handler/index]
+ {:body {:entries "/entries"}}
+
+ :duct.migrator/ragtime
+ {:migrations [#ig/ref :todo.migration/create-entries
+               #ig/ref :todo.migration/create-users]}
+
+ [:duct.migrator.ragtime/sql :todo.migration/create-entries]
+ {:up ["CREATE TABLE entries (id INTEGER PRIMARY KEY, description TEXT)"]
+  :down ["DROP TABLE entries"]}
+
+ [:duct.migrator.ragtime/sql :todo.migration/create-users]
+ {:up ["CREATE TABLE users (id INTEGER PRIMARY KEY, email TEXT UNIQUE, password TEXT)"]
+  :down ["DROP TABLE users"]}
+
+ [:duct.handler.sql/query :todo.handler.entries/list]
+ {:sql ["SELECT * FROM entries"]
+  :hrefs {:href "/entries/{id}"}}
+
+ [:duct.handler.sql/insert :todo.handler.entries/create]
+ {:request {[_ description] :ataraxy/result}
+  :sql     ["INSERT INTO entries (description) VALUES (?)" description]
+  :location "/entries/{last_insert_rowid}"}
+
+ [:duct.handler.sql/query-one :todo.handler.entries/find]
+ {:request {[_ id] :ataraxy/result}
+  :sql     ["SELECT * FROM entries WHERE id = ?" id]
+  :hrefs   {:href "/entries/{id}"}}
+
+ [:duct.handler.sql/execute :todo.handler.entries/destroy]
+ {:request {[_ id] :ataraxy/result}
+  :sql     ["DELETE FROM entries WHERE id = ?" id]}
+
+ :todo.handler.users/create
+ {:db #ig/ref :duct.database/sql}}
