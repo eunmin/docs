@@ -57,65 +57,54 @@ prep 단계에 모듈이 필요한 다른 키에 대한 참조는 ``::requires``
 모듈이 초기화 될때 ``::precondition`` 키 다음에 ``::module`` 키가 초기화 되도록 보장해 줍니다.
 
 
-Profiles
+프로필
 ~~~~~~~~
 
-In 0.10
+0.10 버전에서
 """""""
 
-In previous versions of Duct, modules and normal Integrant keys
-existed within the same configuration:
+이전 버전의 duct에서는 모듈과 일반 Integrant 키가 같은 설정에 있었습니다:
 
 .. code-block:: clojure
 
   {:duct.core/project-ns foo
    :duct.module/example  {}}
 
-However, this meant that the configuration had to be split into module
-keys and non-module keys before it could be initiated. It also lead to
-problems if module keys and non-module keys shared refs.
+하지만 이런 방식을 쓰면 초기화를 하기 전에 모듈 키와 일반 키가 분리되어야 합니다. 또 모듈 키와 일반 키가
+레퍼런스를 공유하면 문제가 될 수도 있습니다.
 
-While it's convenient to have module and non-module keys in the same
-configuration map, it also produces a leaky abstraction.
+또 같은 설정 맵에 모듈 키와 일반 키가 함께 있는 것은 편리하지만 추상화를 깰 수 있습니다.
 
 
-In 0.11
+0.11 버전에서
 """""""
 
-The solution to this is to explicitly separate module keys from
-non-module keys. The way Duct handles this in version 0.11 is to make
-every key in the configuration a module. Non-module keys are placed
-into profiles, like so:
+해결 방법은 모듈 키를 일반 키로 부터 명확하게 분리하는 것입니다. Duct 0.11 버전에서는 모든 모듈 키에
+이 방법을 적용합니다. 일반 키는 아래와 같이 프로필 안에 씁니다:
 
 .. code-block:: clojure
 
   {:duct.profile/base   {:duct.core/project-ns foo}
    :duct.module/example {}}
 
-Profiles are just modules that meta-merge their value into the
-configuration.
+프로필은 단순히 프로필 설정 값을 전체 설정 값에 meta-merge 하는 모듈 입니다.
 
-This results in a tiered structure with a clear separation between
-tiers: a Duct configuration produces an Integrant configuration, which
-is then used to create a running system of dependent components.
+그 결과 계층 사이에 명확히 분리된 계층 구조를 만듭니다: Duct 설정은 동작하는 시스템에 필요한 의존성과
+함께 Integrant 설정을 만듭니다.
 
-To ensure that profiles are run before any other module, we need a way
-of defining a set of dependencies. Integrant 0.7 introduces refsets to
-solve this problem. Refsets act like refs, except they produce a set
-of all matching keys.
+프로필이 다른 모듈이 시작되기 전에 실행 되는 것을 보장하려면 의존성을 정의할 방법이 필요합니다.
+이 문제를 해결하기 위해 Integrant 0.7 버전에 refsets 기능이 추가되었습니다. Refset은 ref 처럼
+동작하는데 매칭되는 모든 키의 set을 생성해 준다는 점이 ref와 다릅니다.
 
-We can use refsets to ensure that any key derived from
-``:duct/module`` must be applied after a key deriving from
-``:duct/profile``. In ``duct.core`` there is the following definition
-that does exactly that:
+``:duct/profile`` 을 상속한 키가 실행 된 후에 ``:duct/module`` 을 상속한 키를 적용하기 위해
+refset을 쓸 수 있습니다. ``duct.core`` 에 아래와 같이 정의 되어 있습니다:
 
 .. code-block:: clojure
 
   (defmethod ig/prep-key :duct/module [_ profile]
     (assoc profile ::requires (ig/refset :duct/profile)))
 
-Between refs, refsets and keyword inheritance, we can set up
-sophisticated but predictable dependency graphs.
+ref와 refset, 키워드 상속 간에 복잡하지만 예측 가능한 의존성 그래프를 설정 할 수 있습니다.
 
 
 Includes
